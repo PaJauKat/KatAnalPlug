@@ -23,7 +23,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
 @PluginDescriptor(
-		name = "Comedor Bebedor",
+		name = "<html><font color=\"#ff6961\">Comedor Bebedor</font></html>",
 		description = "Se toma weas al bajar del numerito puesto",
 		enabledByDefault = false,
 		tags = {"ethan","pajau"}

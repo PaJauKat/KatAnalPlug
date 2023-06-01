@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @PluginDescriptor(
-		name = "Lava Runecrafter",
+		name = "<html><font color=\"#ff6961\">Nightmare Ayuda</font></html>",
 		description = "",
 		enabledByDefault = false,
 		tags = {"ethan"}

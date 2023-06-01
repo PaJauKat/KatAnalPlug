@@ -21,7 +21,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import java.util.Optional;
 
 @PluginDescriptor(
-		name = "3t4g",
+		name = "<html><font color=\"#ff6961\">3t4g</font></html>",
 		enabledByDefault = false,
 		description = "no quieres saber lo q hace, creeme"
 )

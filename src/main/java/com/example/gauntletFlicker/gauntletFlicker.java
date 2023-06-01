@@ -32,7 +32,7 @@ import javax.inject.Inject;
 import java.util.Set;
 
 @PluginDescriptor(
-		name = "Gauntlet Pichulong",
+		name = "<html><font color=\"#ff6961\">Gauntlet Pichulong</font></html>",
 		description = "Cambia los prayers y el arma en Hunlef",
 		tags = {"ethan","pajau"}
 )

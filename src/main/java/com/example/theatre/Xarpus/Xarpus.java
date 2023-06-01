@@ -40,7 +40,7 @@ public class Xarpus extends Room {
     private boolean isInstanceTimerRunning = false;
     private boolean nextInstance = true;
     private boolean exhumedSpawned = false;
-    private final Map<Long, Pair<GroundObject, Integer>> xarpusExhumeds = new HashMap();
+    private final Map<Long, Pair<GroundObject, Integer>> xarpusExhumeds = new HashMap<>();
     private Counter exhumedCounter;
     private int exhumedCount;
     private int xarpusTicksUntilAttack;
@@ -57,7 +57,7 @@ public class Xarpus extends Room {
     }
 
     public void init() {
-        EXHUMED_COUNT_ICON = ImageUtil.resizeCanvas(ImageUtil.getResourceStreamFromClass(TheatrePlugin.class, "1067-POISON.png"), 26, 26);
+        //EXHUMED_COUNT_ICON = ImageUtil.resizeCanvas(ImageUtil.loadImageResource(TheatrePlugin.class, "1067-POISON.png"), 26, 26);
     }
 
     public void load() {

@@ -29,7 +29,7 @@ import static com.example.EthanApiPlugin.QuickPrayer.PROTECT_FROM_MISSILES;
 @PluginDependency(PacketUtilsPlugin.class)
 @PluginDependency(EthanApiPlugin.class)
 @PluginDescriptor(
-		name = "Nightmare Ayuda",
+		name = "<html><font color=\"#ff6961\">Nightmare Ayuda</font></html>",
 		description = "Flickea los prayers del nightmare sin gastar pray pot",
 		enabledByDefault = false,
 		tags = {"ethan","pajau"}

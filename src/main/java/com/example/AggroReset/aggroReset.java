@@ -2,7 +2,6 @@ package com.example.AggroReset;
 
 import com.example.Packets.MousePackets;
 import com.example.Packets.MovementPackets;
-import com.example.pathmarker.Pathfinder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
@@ -50,7 +49,6 @@ public class  aggroReset extends Plugin {
 
     private GeneralPath AreaSafe;
 
-    private Pathfinder pathfinder;
     private boolean reseteando=false;
     private int timeout=-1;
     private int contador=0;

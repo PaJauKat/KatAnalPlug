@@ -2,7 +2,6 @@ package com.example.AgroReset;
 
 import com.example.Packets.MousePackets;
 import com.example.Packets.MovementPackets;
-import com.example.pathmarker.Pathfinder;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.LocalPoint;
@@ -49,8 +48,6 @@ public class agroReset extends Plugin {
     private NpcAggroAreaPlugin npcAggroAreaPlugin;
 
     private GeneralPath AreaSafe;
-
-    private Pathfinder pathfinder;
     private boolean reseteando=false;
     private int timeout=-1;
     private int contador=0;
@@ -116,14 +113,14 @@ public class agroReset extends Plugin {
             timeout--;
             return;
         }
-        AreaSafe = npcAggroAreaPlugin.getLinesToDisplay()[client.getPlane()];
-        if (AreaSafe == null) {
-            return;
+        if(npcAggroAreaPlugin.getLinesToDisplay() != null) {
+            AreaSafe = npcAggroAreaPlugin.getLinesToDisplay()[client.getPlane()];
         }
 
-
         CollisionData[] collisionData=client.getCollisionMaps();
-        assert collisionData != null;
+        if(collisionData == null){
+            return;
+        }
         CollisionData collActual = collisionData[client.getPlane()];
         Player jugador = client.getLocalPlayer();
         WorldArea playerArea = client.getLocalPlayer().getWorldArea();
@@ -144,6 +141,7 @@ public class agroReset extends Plugin {
                 timeout=5;
             }
         } else if (estado == 20) {
+            if(npcAggroAreaPlugin.getEndTime()==null) return;
             if (Instant.now().isAfter(npcAggroAreaPlugin.getEndTime()) ) {
                 choosen=null;
                 for (int i = 1; i < 22; i++) {

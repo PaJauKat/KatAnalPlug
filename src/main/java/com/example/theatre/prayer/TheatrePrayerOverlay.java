@@ -40,7 +40,7 @@ public abstract class TheatrePrayerOverlay extends Overlay {
     protected abstract boolean isEnabled();
 
     public Dimension render(Graphics2D graphics) {
-        Widget meleePrayerWidget = this.client.getWidget(WidgetInfoExtended.PRAYER_PROTECT_FROM_MELEE.getPackedId());
+        Widget meleePrayerWidget = this.client.getWidget(WidgetInfoExtended.PRAYER_PROTECT_FROM_MELEE.getPackedId());   //35454999
         Widget rangePrayerWidget = this.client.getWidget(WidgetInfoExtended.PRAYER_PROTECT_FROM_MISSILES.getPackedId());
         Widget magicPrayerWidget = this.client.getWidget(WidgetInfoExtended.PRAYER_PROTECT_FROM_MAGIC.getPackedId());
         boolean prayerWidgetHidden = meleePrayerWidget == null || rangePrayerWidget == null || magicPrayerWidget == null || meleePrayerWidget.isHidden() || rangePrayerWidget.isHidden() || magicPrayerWidget.isHidden();
