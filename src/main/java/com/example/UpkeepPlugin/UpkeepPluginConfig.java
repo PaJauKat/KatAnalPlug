@@ -3,182 +3,136 @@ package com.example.UpkeepPlugin;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
-import net.runelite.client.config.ConfigSection;
 
 @ConfigGroup("UpkeepPlugin")
-public interface UpkeepPluginConfig extends Config
-{
-	@ConfigSection(
-			name = "Vida",
-			description = "",
-			position = -10,
-			closedByDefault = false
-	)
-	String Vidita = "HP";
+public interface UpkeepPluginConfig extends Config {
+    @ConfigItem(
+            keyName = "HealthLowAmount",
+            name = "Health Low Amount",
+            description = "Health low actions will fire when health falls below this value"
+    )
+    default int HealthLowAmount() {
+        return 0;
+    }
 
-	@ConfigItem(
-			keyName = "HealthLowAmount",
-			name = "HP critica",
-			description = "Vida critica",
-			position = -2,
-			section = Vidita
-	)
-	default int HealthLowAmount()
-	{
-		return 0;
-	}
+    @ConfigItem(
+            keyName = "HealthLowActions",
+            name = "Health Low Actions",
+            description = "List of item actions to use when health falls below value"
+    )
+    default String HealthActions() {
+        return "";
+    }
 
-	@ConfigItem(
-			keyName = "HealthLowActions",
-			name = "Vida accion",
-			description = "Que hacer al bajar de la vida critica",
-			position = -3,
-			section = Vidita
-	)
-	default String HealthActions()
-	{
-		return "";
-	}
+    @ConfigItem(
+            keyName = "StaminaLowAmount",
+            name = "Stamina Low Amount",
+            description = "Health low actions will fire when stamina falls below this value"
+    )
+    default int StaminaLowAmount() {
+        return 0;
+    }
 
-	@ConfigSection(
-			name = "Run Energy",
-			description = "",
-			position = 9
-	) String runEnergy = "RunEnergy";
+    @ConfigItem(
+            keyName = "StaminaLowActions",
+            name = "Stamina Low Actions",
+            description = "List of item actions to use when stamina falls below value"
+    )
+    default String StaminaActions() {
+        return "";
+    }
 
-	@ConfigItem(
-			keyName = "StaminaLowAmount",
-			name = "Run Energy",
-			description = "Run critico",
-			position = -6,
-			section = runEnergy
-	)
-	default int StaminaLowAmount()
-	{
-		return 0;
-	}
+    @ConfigItem(
+            keyName = "RangeLowAmount",
+            name = "Range Low Amount",
+            description = "Health low actions will fire when range falls below this value"
+    )
+    default int RangeLowAmount() {
+        return 0;
+    }
 
-	@ConfigItem(
-			keyName = "StaminaLowActions",
-			name = "Run Energy Accion",
-			description = "Que hacer al bajar del Run critico",
-			position = -7,
-			section = runEnergy
-	)
-	default String StaminaActions()
-	{
-		return "";
-	}
+    @ConfigItem(
+            keyName = "RangeLowActions",
+            name = "Range Low Actions",
+            description = "List of item actions to use when range falls below value"
+    )
+    default String RangeActions() {
+        return "";
+    }
 
-	@ConfigItem(
-			keyName = "RangeLowAmount",
-			name = "Ranged critico",
-			description = "Ranged Critico"
-	)
-	default int RangeLowAmount()
-	{
-		return 0;
-	}
+    @ConfigItem(
+            keyName = "PrayerLowAmount",
+            name = "Prayer Low Amount",
+            description = "Health low actions will fire when prayer falls below this value"
+    )
+    default int PrayerLowAmount() {
+        return 0;
+    }
 
-	@ConfigItem(
-			keyName = "RangeLowActions",
-			name = "Range critico acciones",
-			description = "Acciones Ranged critico"
-	)
-	default String RangeActions()
-	{
-		return "";
-	}
+    @ConfigItem(
+            keyName = "PrayerLowActions",
+            name = "Prayer Low Actions",
+            description = "List of item actions to use when prayer falls below value"
+    )
+    default String PrayerActions() {
+        return "";
+    }
 
-	@ConfigSection(
-			name = "Prayer",
-			description = "",
-			position = -8
-	) String Prayercito = "Prayercito";
+    @ConfigItem(
+            keyName = "MagicLowAmount",
+            name = "Magic Low Amount",
+            description = "Health low actions will fire when magic falls below this value"
+    )
+    default int MagicLowAmount() {
+        return 0;
+    }
 
-	@ConfigItem(
-			keyName = "PrayerLowAmount",
-			name = "Prayer critico",
-			description = "Prayer critico",
-			position = 3,
-			section = Prayercito
-	)
-	default int PrayerLowAmount()
-	{
-		return 0;
-	}
+    @ConfigItem(
+            keyName = "MagicLowActions",
+            name = "Magic Low Actions",
+            description = "List of item actions to use when magic falls below value"
+    )
+    default String MagicActions() {
+        return "";
+    }
 
-	@ConfigItem(
-			keyName = "PrayerLowActions",
-			name = "Prayer critico Acciones",
-			description = "Prayer critico Acciones",
-			position = 4,
-			section = Prayercito
-	)
-	default String PrayerActions()
-	{
-		return "";
-	}
+    @ConfigItem(
+            keyName = "StrengthLowAmount",
+            name = "Strength Low Amount",
+            description = "Health low actions will fire when strength falls below this value"
+    )
+    default int StrengthLowAmount() {
+        return 0;
+    }
 
-	@ConfigItem(
-			keyName = "MagicLowAmount",
-			name = "Magic critico",
-			description = "Magic critico"
-	)
-	default int MagicLowAmount()
-	{
-		return 0;
-	}
-
-	@ConfigItem(
-			keyName = "MagicLowActions",
-			name = "Magic critico acciones",
-			description = "Magic critico acciones"
-	)
-	default String MagicActions()
-	{
-		return "";
-	}
-
-	@ConfigItem(
-			keyName = "StrengthLowAmount",
-			name = "Strength critico",
-			description = "Strength critico"
-	)
-	default int StrengthLowAmount()
-	{
-		return 0;
-	}
-
-	@ConfigItem(
-			keyName = "StrengthLowActions",
-			name = "Strength critico Aciones",
-			description = "Strength critico Aciones"
-	)
-	default String StrengthActions()
-	{
-		return "";
-	}
-	//
-	//	@ConfigItem(
-	//			keyName = "AntiFireActions",
-	//			name = "AntiFire Actions",
-	//			description = "List of item actions to use when not antifired",
-	//			position = 200
-	//	)
-	//	default String AntiFireActions()
-	//	{
-	//		return "";
-	//	}
-	//
-	//	@ConfigItem(
-	//			keyName = "AntiPoisonActions",
-	//			name = "AntiPoison Actions",
-	//			description = "List of item actions to use when not antipoisoned/antivenomed",
-	//			position = 201
-	//	)
-	//	default String AntiPoisonActions()
-	//	{
-	//		return "";
-	//	}
+    @ConfigItem(
+            keyName = "StrengthLowActions",
+            name = "Strength Low Actions",
+            description = "List of item actions to use when strength falls below value"
+    )
+    default String StrengthActions() {
+        return "";
+    }
+    //
+    //	@ConfigItem(
+    //			keyName = "AntiFireActions",
+    //			name = "AntiFire Actions",
+    //			description = "List of item actions to use when not antifired",
+    //			position = 200
+    //	)
+    //	default String AntiFireActions()
+    //	{
+    //		return "";
+    //	}
+    //
+    //	@ConfigItem(
+    //			keyName = "AntiPoisonActions",
+    //			name = "AntiPoison Actions",
+    //			description = "List of item actions to use when not antipoisoned/antivenomed",
+    //			position = 201
+    //	)
+    //	default String AntiPoisonActions()
+    //	{
+    //		return "";
+    //	}
 }
