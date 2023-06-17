@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.*;
 
 //@Extension
-@PluginDescriptor(name = "<html><font color=\"#00ff00\">Pajau Falda</font></html>", enabledByDefault = false, description = "Ayuda al grindeo de la falda(nightmare)", tags = {"pajau", "falda", "overlay", "nightmare"})
+@PluginDescriptor(name = "<html><font color=\"#00ff00\">Pajau Nightmare</font></html>", enabledByDefault = false, description = "Ayuda al grindeo de la falda(nightmare)", tags = {"pajau", "falda", "overlay", "nightmare"})
 @Singleton
 public class FaldaPlugin extends Plugin {
 	private static final Logger log = LoggerFactory.getLogger(FaldaPlugin.class);

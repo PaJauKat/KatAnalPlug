@@ -5,9 +5,10 @@
 
 package com.example.theatre.prayer;
 
-import com.example.WidgetInfoExtended;
+import com.example.PacketUtils.WidgetInfoExtended;
 
 public enum Prayer {
+
     THICK_SKIN(4104, 5.0, WidgetInfoExtended.PRAYER_THICK_SKIN),
     BURST_OF_STRENGTH(4105, 5.0, WidgetInfoExtended.PRAYER_BURST_OF_STRENGTH),
     CLARITY_OF_THOUGHT(4106, 5.0, WidgetInfoExtended.PRAYER_CLARITY_OF_THOUGHT),

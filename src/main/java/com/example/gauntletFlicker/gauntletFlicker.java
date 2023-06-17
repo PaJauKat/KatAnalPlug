@@ -25,7 +25,7 @@ import java.util.Set;
 @PluginDescriptor(
         name = "Gauntlet Flicker and Switcher",
         description = "",
-        tags = {"ethan"}
+        tags = {"ethan","pajau"}
 )
 @PluginDependency(EthanApiPlugin.class)
 @PluginDependency(PacketUtilsPlugin.class)

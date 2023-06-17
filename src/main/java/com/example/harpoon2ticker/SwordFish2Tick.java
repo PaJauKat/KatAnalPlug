@@ -27,7 +27,7 @@ import java.util.*;
 @PluginDescriptor(
         name = "SwordFish2Tick",
         enabledByDefault = false,
-        tags = {"ethan"}
+        tags = {"ethan","pajau"}
 )
 @PluginDependency(EthanApiPlugin.class)
 @PluginDependency(PacketUtilsPlugin.class)

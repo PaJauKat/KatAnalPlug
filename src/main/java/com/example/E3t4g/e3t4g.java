@@ -25,7 +25,8 @@ import java.util.Optional;
 
 @PluginDescriptor(
         name = "3t4g",
-        enabledByDefault = false
+        enabledByDefault = false,
+        tags = {"pajau"}
 )
 @PluginDependency(EthanApiPlugin.class)
 @PluginDependency(PacketUtilsPlugin.class)

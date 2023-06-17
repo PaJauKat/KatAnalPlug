@@ -33,7 +33,7 @@ import java.util.List;
         name = "Lava Runecrafter",
         description = "",
         enabledByDefault = false,
-        tags = {"ethan"}
+        tags = {"ethan","pajau"}
 )
 @PluginDependency(PacketUtilsPlugin.class)
 @PluginDependency(EthanApiPlugin.class)

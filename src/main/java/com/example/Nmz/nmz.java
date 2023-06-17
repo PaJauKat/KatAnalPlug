@@ -23,8 +23,8 @@ public class nmz extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
-        absPts=client.getVarbitValue(Varbits.NMZ_ABSORPTION);
-        ovlFreshRemain=client.getVarbitValue(Varbits.NMZ_OVERLOAD_REFRESHES_REMAINING);
+        //absPts=client.getVarbitValue(Varbits.NMZ_ABSORPTION);
+        //ovlFreshRemain=client.getVarbitValue(Varbits.NMZ_OVERLOAD_REFRESHES_REMAINING);
         log.info("Abs: {}     Ovl:{}",absPts,ovlFreshRemain);
     }
 

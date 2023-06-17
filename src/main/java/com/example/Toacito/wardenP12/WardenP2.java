@@ -14,6 +14,7 @@ import net.runelite.client.eventbus.Subscribe;
 
 import javax.inject.Inject;
 import java.util.Arrays;
+import java.util.Objects;
 
 @Getter
 @Slf4j
@@ -33,8 +34,8 @@ public class WardenP2 extends Sala {
 
 	public static boolean enPelea= false;
 	public static boolean inFight = false;
-	private int hitCounter;
-	private Actor corazon;
+	private int hitCounter=0;
+	private Actor corazon = null;
 
 
 	@Override
@@ -70,7 +71,6 @@ public class WardenP2 extends Sala {
 			if(yo.getInteracting()==null) return;
 			if(yo.getInteracting().getName()==null) return;
 			if(yo.getInteracting().getName().toLowerCase().contains("core") && Arrays.stream(new int[]{829,-1,388}).noneMatch(w->(yo.getAnimation()==w))){
-				corazon=yo.getInteracting();
 				hitCounter++;
 			}
 		}
@@ -98,6 +98,9 @@ public class WardenP2 extends Sala {
 		if(event.getNpc() == null) return;
 		if(event.getNpc().getId() == 11750) {
 			enPelea = true;
+		} else if (Objects.requireNonNull(event.getNpc().getName()).toLowerCase().contains("core")) {
+			corazon = event.getNpc();
+			hitCounter=0;
 		}
 	}
 

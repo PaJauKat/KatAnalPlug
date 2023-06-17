@@ -1,12 +1,14 @@
 package com.example.nexSimple;
 
-import com.example.EthanApiPlugin.Inventory;
-import com.example.EthanApiPlugin.NPCs;
+import com.example.EthanApiPlugin.Collections.Inventory;
+import com.example.EthanApiPlugin.Collections.NPCs;
 import com.example.InteractionApi.InteractionHelper;
 import com.example.InteractionApi.InventoryInteraction;
 import com.example.InteractionApi.NPCInteraction;
+import com.example.PacketUtils.WidgetInfoExtended;
 import com.example.Packets.MousePackets;
 import com.example.Packets.MovementPackets;
+import com.example.PajauApi.PajauApiPlugin;
 import com.google.inject.Provides;
 import com.google.protobuf.Internal;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +39,7 @@ import java.util.*;
 
 @Slf4j
 @PluginDescriptor(
-        name = "Nex Tulong",
+        name = "Nex Simple",
         tags = {"pajau"},
         enabledByDefault = false
 )
@@ -107,13 +109,14 @@ public class NexSimplePlugin extends Plugin {
             clientThread.invoke(() -> {
                 encendido = !encendido;
                 if (encendido) {
-                    estado = State.ENTRAR;
+                    estado = State.FASE_1;
                 } else {
                     estado = State.APAGADO;
                 }
             });
         }
     };
+    private boolean flagContain = false;
 
 
     @Override
@@ -144,6 +147,7 @@ public class NexSimplePlugin extends Plugin {
     }
 
     public WorldPoint aLocalInstance(Client ct,WorldPoint worldPoint){
+
         return WorldPoint.toLocalInstance(ct,worldPoint).toArray(WorldPoint[]::new)[0];
 
     }
@@ -181,10 +185,23 @@ public class NexSimplePlugin extends Plugin {
             }
         }
 
+
+        WorldArea areaMonkas;
+        WorldArea areaNex = null;
+
         Player player = client.getLocalPlayer();
+        if (nex != null) {
+            areaMonkas = new WorldArea(nex.getWorldLocation().getX()-5,nex.getWorldLocation().getY()-5,
+                    12,12,client.getPlane());
+            areaNex = new WorldArea(nex.getWorldLocation().getX()-10,nex.getWorldLocation().getY()-10,
+                    22,22,client.getPlane());
+        } else {
+            areaMonkas = null;
+        }
+
         if (estado == State.FASE_1) {
 
-            if(nex.isDead() || nex ==null){
+            if(nex ==null){
                 log.info("Buscando a nex");
                 Optional<NPC> nix = NPCs.search().withId(11278).first();
                 nix.ifPresent(x -> nex=x );
@@ -205,7 +222,7 @@ public class NexSimplePlugin extends Plugin {
                 return;
             }
 
-            if (nex.getAnimation() == 9178 && player.getWorldLocation().isInArea(areaPuntaNorte)) {    //todo ver si la animacion es diferente para cada punta de Cruz
+            if (nex.getAnimation() == 9178 && WorldPoint.fromLocalInstance(client,player.getLocalLocation()).isInArea(areaPuntaNorte)) {    //todo ver si la animacion es diferente para cada punta de Cruz
                 log.info("esquivando");
                 MousePackets.queueClickPacket();
                 moverHacia(client,new WorldPoint(2923,5213,client.getPlane()));
@@ -241,12 +258,8 @@ public class NexSimplePlugin extends Plugin {
                 return;
             }
             CollisionData col = client.getCollisionMaps()[client.getPlane()];
-
-            WorldArea areaNex = new WorldArea(nex.getWorldLocation().getX()-10,nex.getWorldLocation().getY()-10,
-                    22,22,client.getPlane());
-            WorldArea areaMonkas = new WorldArea(nex.getWorldLocation().getX()-5,nex.getWorldLocation().getY()-5,
-                    12,12,client.getPlane());
             WorldPoint wpGamer = player.getWorldLocation();
+
 
             if (isIdle(player)) {
                 if (flagWeaNegra) {
@@ -296,11 +309,6 @@ public class NexSimplePlugin extends Plugin {
             CollisionData col = Objects.requireNonNull(client.getCollisionMaps())[client.getPlane()];
             WorldPoint escapeTile = null;
 
-            WorldArea areaNex = new WorldArea(nex.getWorldLocation().getX()-10,nex.getWorldLocation().getY()-10,
-                    22,22,client.getPlane());
-            WorldArea areaMonkas = new WorldArea(nex.getWorldLocation().getX()-5,nex.getWorldLocation().getY()-5,
-                    12,12,client.getPlane());
-
             if(player.getWorldLocation().isInArea(umbraAttackArea) && !player.getWorldLocation().isInArea(areaMonkas)){
                 if(!player.isInteracting()){
                     NPCs.search().nameContains("Umbra").first().ifPresent(x->NPCInteraction.interact(x,"Attack"));
@@ -323,13 +331,143 @@ public class NexSimplePlugin extends Plugin {
         }
 
         else if (estado == State.FASE_3) {
+
+            if (client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MAGIC) == 0) {
+                InteractionHelper.toggleNormalPrayer(WidgetInfoExtended.PRAYER_PROTECT_FROM_MAGIC.getPackedId());
             }
+            if (isIdle(player)) {
+
+                if (nex.getAnimation()==9183) {
+                    NPCs.search().withId(11294).first().ifPresent(reaver -> NPCInteraction.interact(reaver, "Attack"));
+                } else {
+
+                    if (!player.isInteracting()) {
+                        NPCInteraction.interact(nex, "Attack");
+                    } else {
+                        if(player.getInteracting().getName() == null) return;
+                        if(!player.getInteracting().getName().contains("Nex")){
+                            NPCInteraction.interact(nex, "Attack");
+                        }
+                    }
+                }
+
+            }
+        }
+
+        else if (estado == State.CRUOR) {
+            Optional<NPC> cruor = NPCs.search().nameContains("Cruor").first();
+
+            if(cruor.isPresent() ){
+                if (cruor.get().isDead()) {
+                    estado=State.FASE_4;
+                }
+            }else {
+                estado=State.FASE_4;
+            }
+
+            if (client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MAGIC) == 0) {
+                InteractionHelper.toggleNormalPrayer(WidgetInfoExtended.PRAYER_PROTECT_FROM_MAGIC.getPackedId());
+            }
+            if (isIdle(player)) {
+                if (player.getInteracting().getName() != null) {
+                    if (!player.getInteracting().getName().contains("Cruor")) {
+                        cruor.ifPresent(x->NPCInteraction.interact(x, "Attack"));
+                    }
+                }
+            }
+        }
+
+        else if (estado == State.FASE_4) {
+            if (client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MAGIC) == 0) {
+                InteractionHelper.toggleNormalPrayer(WidgetInfoExtended.PRAYER_PROTECT_FROM_MAGIC.getPackedId());
+            }
+
+            if (flagContain && !(player.getWorldArea().isInMeleeDistance(nex.getWorldArea()) || nex.getWorldArea().contains(player.getWorldLocation())) ) {
+                flagContain = false;
+            }
+
+            if (flagContain) {
+                if (player.getWorldArea().isInMeleeDistance(nex.getWorldArea()) || nex.getWorldArea().contains(player.getWorldLocation())) {
+                    WorldPoint tileContainEscape = null;
+                    for (int i = 1; i <= 4; i++) {
+                        tileContainEscape = PajauApiPlugin.TilesAvalibleRadial(client, i, player.getWorldLocation(), x -> {
+                            return x.isInArea(nex.getWorldArea()) && x.toWorldArea().isInMeleeDistance(nex.getWorldArea());
+                        });
+                    }
+
+                    if (tileContainEscape != null) {
+                        MousePackets.queueClickPacket();
+                        MovementPackets.queueMovement(tileContainEscape);
+                    } else {
+                        log.info("A comerse el Contain :(");
+                    }
+                }
+            } else if (isIdle(player)) {
+                if (!player.isInteracting()) {
+                    NPCInteraction.interact(nex, "Attack");
+                }
+            }
+        }
+
+        else if (estado == State.GLACIES) {
+            Optional<NPC> glacies = NPCs.search().nameContains("Glacies").first();
+
+            if(glacies.isPresent() ){
+                if (glacies.get().isDead()) {
+                    estado=State.FASE_5;
+                }
+            }else {
+                estado=State.FASE_5;
+            }
+
+            if (client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MAGIC) == 0) {
+                InteractionHelper.toggleNormalPrayer(WidgetInfoExtended.PRAYER_PROTECT_FROM_MAGIC.getPackedId());
+            }
+
+            if (flagContain && !(player.getWorldArea().isInMeleeDistance(nex.getWorldArea()) || nex.getWorldArea().contains(player.getWorldLocation())) ) {
+                flagContain = false;
+            }
+
+            if (flagContain) {
+                if (player.getWorldArea().isInMeleeDistance(nex.getWorldArea()) || nex.getWorldArea().contains(player.getWorldLocation())) {
+                    WorldPoint tileContainEscape = null;
+                    for (int i = 1; i <= 4; i++) {
+                        tileContainEscape = PajauApiPlugin.TilesAvalibleRadial(client, i, player.getWorldLocation(), x -> {
+                            return x.isInArea(nex.getWorldArea()) && x.toWorldArea().isInMeleeDistance(nex.getWorldArea());
+                        });
+                    }
+
+                    if (tileContainEscape != null) {
+                        MousePackets.queueClickPacket();
+                        MovementPackets.queueMovement(tileContainEscape);
+                    } else {
+                        log.info("A comerse el Contain :(");
+                    }
+                }
+            } else if (isIdle(player)) {
+                if (player.getInteracting().getName()==null || !player.getInteracting().getName().contains("Glacies")) {
+                    glacies.ifPresent(x -> NPCInteraction.interact(x, "Attack"));
+                }
+            }
+        }
+
+        else if (estado == State.FASE_5) {
+            if (client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MAGIC) == 0) {
+                InteractionHelper.toggleNormalPrayer(WidgetInfoExtended.PRAYER_PROTECT_FROM_MAGIC.getPackedId());
+            }
+            if (isIdle(player)) {
+                if (player.getInteracting().getName() == null) {
+                    NPCInteraction.interact(nex, "Attack");
+                }
+            }
+
+        }
 
     }
 
 
     @Subscribe
-    void onChatmessage(ChatMessage event) {
+    void onChatMessage(ChatMessage event) {
         if (event.getMessage().contains("Fumus, don't fail me!")) {
             estado = State.FUMUS;
         } else if (event.getMessage().contains("Umbra, don't fail me!")) {
@@ -339,6 +477,12 @@ public class NexSimplePlugin extends Plugin {
         } else if (event.getMessage().contains("Glacies, don't fail me!")) {
             estado = State.GLACIES;
         }
+
+        if (event.getMessage().contains("Contain this")) {
+            flagContain=true;
+        }
+
+
     }
 
     @Subscribe

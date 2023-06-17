@@ -30,7 +30,7 @@ import static com.example.EthanApiPlugin.Collections.query.QuickPrayer.*;
         name = "NightmareHelper",
         description = "",
         enabledByDefault = false,
-        tags = {"ethan"}
+        tags = {"ethan","pajau"}
 )
 public class NightmareHelperPlugin extends Plugin {
     @Inject

@@ -1,8 +1,8 @@
 package com.example.Robador;
 
-import com.example.EthanApiPlugin.BankInventory;
-import com.example.EthanApiPlugin.Inventory;
-import com.example.EthanApiPlugin.TileObjects;
+import com.example.EthanApiPlugin.Collections.BankInventory;
+import com.example.EthanApiPlugin.Collections.Inventory;
+import com.example.EthanApiPlugin.Collections.TileObjects;
 import com.example.InteractionApi.*;
 import com.example.Packets.MousePackets;
 import com.example.Packets.MovementPackets;

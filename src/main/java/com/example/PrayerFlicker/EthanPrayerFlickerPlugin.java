@@ -28,7 +28,7 @@ import java.lang.reflect.InvocationTargetException;
         name = "Ethan PrayerFlickerPlugin",
         description = "prayer flicker for quick prayers",
         enabledByDefault = false,
-        tags = {"ethan"}
+        tags = {"ethan","pajau"}
 )
 @Slf4j
 @PluginDependency(PacketUtilsPlugin.class)

@@ -11,7 +11,11 @@ import net.runelite.client.plugins.PluginDescriptor;
 import javax.inject.Inject;
 
 @Slf4j
-@PluginDescriptor(name = "<html><font color=\"#00ff00\">Pajau Constru</font></html>",enabledByDefault = false)
+@PluginDescriptor(
+		name = "<html><font color=\"#00ff00\">Pajau Constru</font></html>",
+		enabledByDefault = false,
+		tags = {"pajau"}
+)
 public class ConstruPlugin extends Plugin {
 	@Inject
 	private Client client;

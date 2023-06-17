@@ -1,13 +1,12 @@
 package com.example.nex;
 
-import com.example.EthanApiPlugin.Inventory;
-import com.example.EthanApiPlugin.NPCs;
+import com.example.EthanApiPlugin.Collections.Inventory;
+import com.example.EthanApiPlugin.Collections.NPCs;
 import com.example.InteractionApi.InteractionHelper;
 import com.example.InteractionApi.InventoryInteraction;
 import com.example.InteractionApi.NPCInteraction;
 import com.example.Packets.MousePackets;
 import com.example.Packets.MovementPackets;
-import com.example.Packets.ObjectPackets;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;

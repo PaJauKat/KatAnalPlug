@@ -5,7 +5,7 @@
 
 package com.example.theatre.prayer;
 
-import com.example.WidgetInfoExtended;
+import com.example.PacketUtils.WidgetInfoExtended;
 import com.example.theatre.TheatreConfig;
 import net.runelite.api.Client;
 import net.runelite.api.Prayer;

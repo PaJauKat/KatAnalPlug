@@ -1,11 +1,10 @@
 package com.example.GreenDrags;
 
-import com.example.EthanApiPlugin.*;
+import com.example.EthanApiPlugin.Collections.*;
 import com.example.InteractionApi.BankInteraction;
 import com.example.InteractionApi.BankInventoryInteraction;
 import com.example.InteractionApi.InventoryInteraction;
 import com.example.Packets.*;
-import com.example.Toacito.ToacitoConfig;
 import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -62,7 +61,7 @@ public class GreenDragsPlugin extends Plugin {
 
     @Provides
     GreenDragsConfig getConfig(ConfigManager configManager) {
-        return (GreenDragsConfig) configManager.getConfig(GreenDragsConfig.class);
+        return configManager.getConfig(GreenDragsConfig.class);
     }
 
     void resetear() {

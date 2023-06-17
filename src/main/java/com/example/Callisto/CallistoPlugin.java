@@ -1,16 +1,18 @@
 package com.example.Callisto;
 
-import com.example.EthanApiPlugin.NPCs;
+import com.example.EthanApiPlugin.Collections.NPCs;
 import com.example.InteractionApi.InteractionHelper;
 import com.example.InteractionApi.NPCInteraction;
 import com.example.Packets.NPCPackets;
-import com.example.WidgetInfoExtended;
+import com.example.PacketUtils.WidgetInfoExtended;
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.Projectile;
 import net.runelite.api.Varbits;
 import net.runelite.api.events.*;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -22,11 +24,15 @@ import java.util.Optional;
 @Slf4j
 @PluginDescriptor(
         name = "Callisto",
-        enabledByDefault = false
+        enabledByDefault = false,
+        tags = {"pajau"}
 )
 public class CallistoPlugin extends Plugin {
     @Inject
     private Client client;
+
+    @Inject
+    private CallistoConfig callistoConfig;
     private int timeout = 0;
 
     private Projectile atkMagia = null;
@@ -34,6 +40,11 @@ public class CallistoPlugin extends Plugin {
     private boolean flagMagic=false;
     private boolean flagRanged = false;
     private boolean flagMelee = false;
+
+    @Provides
+    CallistoConfig getConfig(ConfigManager configManager) {
+        return (CallistoConfig) configManager.getConfig(CallistoConfig.class);
+    }
 
     @Subscribe
     void onAnimationChanged(AnimationChanged event) {
@@ -53,6 +64,9 @@ public class CallistoPlugin extends Plugin {
     void onNpcSpawned(NpcSpawned event) {
         if (event.getNpc().getId() == 6609 && client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MISSILES) == 0) {
             InteractionHelper.toggleNormalPrayer(35454998);
+            if (client.getVarbitValue(Varbits.PRAYER_RIGOUR)==0 && callistoConfig.actRigour()) {
+                InteractionHelper.toggleNormalPrayer(WidgetInfoExtended.PRAYER_RIGOUR.getPackedId());
+            }
         }
     }
 
@@ -63,10 +77,14 @@ public class CallistoPlugin extends Plugin {
         } else if (event.getNpc().getId() == 6609 && client.getVarbitValue(Varbits.PRAYER_PROTECT_FROM_MAGIC) == 1) {
             InteractionHelper.toggleNormalPrayer(35454997);
         }
+        if (event.getNpc().getId() == 6609 && client.getVarbitValue(Varbits.PRAYER_RIGOUR) == 1) {
+            InteractionHelper.toggleNormalPrayer(WidgetInfoExtended.PRAYER_RIGOUR.getPackedId());
+        }
     }
 
     private int barragaTimeout=0;
     private int checkTimeout =0;
+
 
 
     @Subscribe
@@ -96,9 +114,12 @@ public class CallistoPlugin extends Plugin {
 
 
         if (calisto.isPresent() && checkTimeout <= 0) {
-            if (calisto.get().getPoseAnimation() == 10009 || calisto.get().getAnimation() == 10015) {
-                barragaTimeout=1;
-                checkTimeout=6;
+            if ( calisto.get().getPoseAnimation() == 10009 ) {
+                barragaTimeout = callistoConfig.barrageTimeout();
+                checkTimeout = barragaTimeout + 5;
+            } else if (calisto.get().getAnimation() == 10015) {
+                barragaTimeout = callistoConfig.grrBarrageTimeout();
+                checkTimeout = barragaTimeout + 5;
             }
 
             if (client.getLocalPlayer().getWorldLocation().distanceTo(calisto.get().getWorldArea()) <= 2) {
