@@ -4,13 +4,11 @@ import net.runelite.api.Client;
 import net.runelite.api.Perspective;
 import net.runelite.api.Point;
 import net.runelite.client.ui.overlay.*;
-import org.pushingpixels.substance.internal.fonts.Fonts;
 
 import javax.inject.Inject;
 import java.awt.*;
 
 public class VenenatisOverlay extends Overlay {
-
     @Inject
     private Client client;
 
@@ -31,9 +29,18 @@ public class VenenatisOverlay extends Overlay {
         if (plugin.getVenenatis() != null) {
             if (plugin.getVenenatis().isDead()) return null;
             graphics.setFont(new Font("Arial",Font.BOLD,24));
+            String texto;
+            Color colorcito;
+            if (plugin.getMoveCounter() == 3) {
+                texto = "Web";
+                colorcito = Color.orange;
+            } else {
+                texto = String.valueOf(plugin.getMoveCounter());
+                colorcito = Color.WHITE;
+            }
 
-            Point punto = Perspective.getCanvasTextLocation(client,graphics,plugin.getVenenatis().getLocalLocation(), String.valueOf(plugin.getMoveCounter()),0);
-            OverlayUtil.renderTextLocation(graphics,punto,String.valueOf(plugin.getMoveCounter()),Color.WHITE);
+            Point punto = Perspective.getCanvasTextLocation(client,graphics,plugin.getVenenatis().getLocalLocation(), texto,0);
+            OverlayUtil.renderTextLocation(graphics,punto,String.valueOf(plugin.getMoveCounter()),colorcito);
         }
         return null;
     }

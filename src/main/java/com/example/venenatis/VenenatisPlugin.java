@@ -31,14 +31,13 @@ public class VenenatisPlugin extends Plugin {
     @Inject
     private OverlayManager overlayManager;
 
-
     private WorldPoint posPasada;
 
     @Getter
     private NPC venenatis = null;
 
     @Getter
-    private int moveCounter = 3;
+    private int moveCounter = -1;
 
     private int offset = 1;
 
@@ -60,7 +59,7 @@ public class VenenatisPlugin extends Plugin {
         if(event.getNpc().getName()==null) return;
         if (event.getNpc().getName().contains("Spiderling")) { //sacar el Id mejor porque las chiquitar tienen el nombre
             log.info("Spawnearon spiderling");
-            moveCounter = 3;
+            moveCounter = 1;
         } else if (event.getNpc().getName().contains("Venenatis")) {
             log.info("Spawneo venenatis");
             venenatis = event.getNpc();
@@ -84,14 +83,16 @@ public class VenenatisPlugin extends Plugin {
         log.info("dentro");
         log.info("moveCounter {}",moveCounter);
         WorldPoint posActual = venenatis.getWorldLocation();
-        if (posPasada == null || posPasada.equals(posActual) ) {
+        log.info("katarina: {}",posActual);
+        log.info("gatarina: {}",posPasada);
+        if (posPasada == null || !posPasada.equals(posActual) ) {
             log.info("woof");
             offset = 2;
             posPasada = posActual;
             if (aux == 0) {
                 log.info("meow");
                 aux = 1;
-                moveCounter--;
+                moveCounter++;
             }
         } else if (aux == 1) {
             offset--;

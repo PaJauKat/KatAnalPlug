@@ -57,7 +57,7 @@ public class Xarpus extends Room {
     }
 
     public void init() {
-        //EXHUMED_COUNT_ICON = ImageUtil.resizeCanvas(ImageUtil.loadImageResource(TheatrePlugin.class, "1067-POISON.png"), 26, 26);
+        EXHUMED_COUNT_ICON = ImageUtil.resizeCanvas(ImageUtil.loadImageResource(TheatrePlugin.class, "1067-POISON.png"), 26, 26);
     }
 
     public void load() {
