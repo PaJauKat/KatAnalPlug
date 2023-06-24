@@ -1,10 +1,7 @@
 package com.example.Caminador;
 
-import com.example.Packets.MovementPackets;
 import lombok.Getter;
 import net.runelite.api.Client;
-import net.runelite.api.Point;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.Keybind;
@@ -34,7 +31,7 @@ public class TestCaminadorPlugin extends Plugin {
     private KeyManager keyManager;
 
     @Inject
-    private caminador pat;
+    private Caminador pat;
 
     @Inject
     private OverlayManager overlayManager;

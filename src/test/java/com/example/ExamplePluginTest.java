@@ -18,6 +18,7 @@ import com.example.Toacito.ToacitoPlugin;
 import com.example.UpkeepPlugin.UpkeepPlugin;
 import com.example.blackjacking.Blackjacking;
 import com.example.faldita.FaldaPlugin;
+import com.example.fungus.FungusPlugin;
 import com.example.gauntletFlicker.gauntletFlicker;
 import com.example.harpoon2ticker.SwordFish2Tick;
 import com.example.nexSimple.NexSimplePlugin;
@@ -37,7 +38,7 @@ public class ExamplePluginTest {
                 , e3t4g.class, AutoTele.class,
                 TheatrePlugin.class, ToacitoPlugin.class, RobadorPlugin.class, GreenDragsPlugin.class, GorilasPlugin.class,
                 CaTimerPlugin.class, CallistoPlugin.class, FaldaPlugin.class, agroReset.class, NexSimplePlugin.class,
-                VenenatisPlugin.class, WorldFinderPlugin.class, Blackjacking.class
+                VenenatisPlugin.class, WorldFinderPlugin.class, Blackjacking.class, FungusPlugin.class
                 );
         RuneLite.main(args);
     }

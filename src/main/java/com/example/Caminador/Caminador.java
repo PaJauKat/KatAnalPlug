@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class caminador {
+public class Caminador {
     private Random nRand = new Random();
 
     public List<WorldPoint> getPath(WorldPoint[] puntos, int radio, Client client){
@@ -46,6 +46,11 @@ public class caminador {
             }
         }
         return null;
+    }
+
+    public WorldArea getAreaFromWP(WorldPoint wp, int radio) {
+        WorldArea area = new WorldArea(wp.getX()-radio,wp.getY()-radio,2*radio +1,2*radio+1,wp.getPlane());
+        return area;
     }
 
 }
