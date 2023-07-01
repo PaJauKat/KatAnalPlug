@@ -12,6 +12,7 @@ import net.runelite.api.events.GameTick;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.Keybind;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.input.KeyListener;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
@@ -33,7 +34,7 @@ import java.util.Objects;
     tags = {"pajau"}
 )
 @PluginDependency(NpcAggroAreaPlugin.class)
-public class agroReset extends Plugin {
+public class agroResetPlugin extends Plugin {
 
     @Inject
     private Client client;
@@ -96,6 +97,26 @@ public class agroReset extends Plugin {
             });
         }
     };
+
+    @Subscribe
+    void onConfigChanged(ConfigChanged event) {
+        if (event.getGroup().equals("agroReset") ) {
+            if (event.getKey().equals("onOff") ) {
+                enAccion=!enAccion;
+                clientThread.invoke(() -> {
+                    if (!enAccion) {
+                        tilePelea = null;
+                        estado=0;
+                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Apagado", Color.GREEN), "");
+                    } else {
+                        tilePelea=client.getLocalPlayer().getWorldLocation();
+                        estado=10;
+                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Prendido", Color.red), "");
+                    }
+                });
+            }
+        }
+    }
 
     public boolean InsideSafe(){
         return AreaSafe.contains(client.getLocalPlayer().getLocalLocation().getX(),client.getLocalPlayer().getLocalLocation().getY());
