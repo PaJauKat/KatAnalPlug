@@ -1,6 +1,6 @@
 package com.example;
 
-import com.example.AgroReset.agroResetPlugin;
+import com.example.AgroReset.AggroResetPlugin;
 import com.example.AutoTele.AutoTele;
 import com.example.CaTimer.CaTimerPlugin;
 import com.example.Callisto.CallistoPlugin;
@@ -18,6 +18,7 @@ import com.example.Toacito.ToacitoPlugin;
 import com.example.UpkeepPlugin.UpkeepPlugin;
 import com.example.alchemicalhydra.AlchemicalHydraPlugin;
 import com.example.blackjacking.Blackjacking;
+import com.example.crabs.CrabsPlugin;
 import com.example.faldita.FaldaPlugin;
 import com.example.fungus.FungusPlugin;
 import com.example.gauntletFlicker.gauntletFlicker;
@@ -39,8 +40,8 @@ public class ExamplePluginTest {
                 NightmareHelperPlugin.class, SwordFish2Tick.class
                 , e3t4g.class, AutoTele.class,
                 TheatrePlugin.class, ToacitoPlugin.class, RobadorPlugin.class, GreenDragsPlugin.class, GorilasPlugin.class,
-                CaTimerPlugin.class, CallistoPlugin.class, FaldaPlugin.class, agroResetPlugin.class, NexSimplePlugin.class,
-                VenenatisPlugin.class, WorldFinderPlugin.class, Blackjacking.class, FungusPlugin.class, HydraPlugin.class,
+                CaTimerPlugin.class, CallistoPlugin.class, FaldaPlugin.class, AggroResetPlugin.class, NexSimplePlugin.class,
+                VenenatisPlugin.class, Blackjacking.class, FungusPlugin.class, HydraPlugin.class,
                 AlchemicalHydraPlugin.class, TestCaminadorPlugin.class
                 );
         RuneLite.main(args);

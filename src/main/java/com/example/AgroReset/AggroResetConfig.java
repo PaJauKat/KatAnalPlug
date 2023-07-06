@@ -5,7 +5,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
 @ConfigGroup("agroReset")
-public interface agroResetConfig extends Config {
+public interface AggroResetConfig extends Config {
     @ConfigItem(
             name = "On/Off",
             keyName = "onOff",
