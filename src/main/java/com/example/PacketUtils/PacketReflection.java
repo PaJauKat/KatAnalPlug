@@ -230,13 +230,13 @@ public class PacketReflection {
             Field var0ar = eqVar0.getClass().getDeclaredField("ar");
             var0ar.setAccessible(true);
             var1ay.setAccessible(true);
-            Field ap = eqVar0.getClass().getDeclaredField("ap");
-            ap.setAccessible(true);
+            //Field ap = eqVar0.getClass().getDeclaredField("ap");
+            //ap.setAccessible(true);
             int var0arValue = var0ar.getInt(eqVar0);
             int x = 1559877663 * var1ay.getInt(lmVar1);
             int totalAzValue = var0arValue + x;
             var0ar.setInt(eqVar0, totalAzValue);
-            ap.setAccessible(false);
+            //ap.setAccessible(false);
             var0ar.setAccessible(false);
             var1ay.setAccessible(false);
             am.setAccessible(false);
