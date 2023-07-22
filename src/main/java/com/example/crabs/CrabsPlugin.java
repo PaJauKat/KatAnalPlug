@@ -43,8 +43,10 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
-@PluginDescriptor(name = "<html><font color=\"#ff6961\">PaJau Crabs</font></html>",
-    tags = {"pajau"}
+@PluginDescriptor(
+        name = "<html>[<font color=\"#FA4444\">P</font>] Crabs</html>",
+        tags = {"pajau"},
+        enabledByDefault = false
 )
 @PluginDependency(NpcAggroAreaPlugin.class)
 public class CrabsPlugin extends Plugin {
@@ -178,8 +180,9 @@ public class CrabsPlugin extends Plugin {
             timeout--;
             return;
         }
-        if (!npcAggroAreaPlugin.isActive()) {
+        if (npcAggroAreaPlugin.getEndTime() == null) {
             log.info("npc agresion timer no activado");
+            timeout = 10;
             client.addChatMessage(ChatMessageType.GAMEMESSAGE,"","Npc agresion timer no activado","");
             return;
         }
@@ -280,9 +283,16 @@ public class CrabsPlugin extends Plugin {
             }
         } else if (estado == Estados.RESETTING) {
             if (npcAggroAreaPlugin.getEndTime().isBefore(Instant.now())) {
-                if (client.getNpcs().stream().noneMatch(x -> x.getInteracting() != null
+                List<NPC> npcs;
+                if (client.getFollower() != null) {
+                    npcs = client.getNpcs().stream().filter(x -> x.getId() != client.getFollower().getId()).collect(Collectors.toList());
+                }else {
+                    npcs = client.getNpcs();
+                }
+
+                if (npcs.stream().noneMatch(x -> x.getInteracting() != null
                         && x.getInteracting().getName() != null
-                        && x.getInteracting().getName().equalsIgnoreCase(jugador.getName()))) { //si no hay npc targeteando al player
+                        && x.getInteracting().getName().equalsIgnoreCase(jugador.getName())) ) { //si no hay npc targeteando al player
                     log.info("no hay targeteandome");
                     if (jugador.getPoseAnimation() == jugador.getIdlePoseAnimation()) {
                         log.info("meow");
@@ -320,6 +330,7 @@ public class CrabsPlugin extends Plugin {
 
                 }
             } else {
+                log.info("Woof");
                 if (!playerPoint.equals(tilePelea)) {
                     if (jugador.getPoseAnimation() == jugador.getIdlePoseAnimation()) {
                         MousePackets.queueClickPacket();

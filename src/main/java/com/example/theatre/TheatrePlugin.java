@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 
 @PluginDescriptor(
-        name = "<html><font color=\"#00ff00\">Teatro Sangriento</font></html>",
+        name = "<html>[<font color=\"#59D634\">P</font>] Teatro Sangriento</html>",
         description = "All-in-one plugin for Theatre of Blood",
         tags = {"ToB", "Theatre", "raids", "bloat", "verzik", "nylo", "xarpus", "sotetseg", "maiden","pajau"},
         enabledByDefault = false

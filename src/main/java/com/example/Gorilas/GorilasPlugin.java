@@ -29,8 +29,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @PluginDependency(PacketUtilsPlugin.class)
 @PluginDependency(EthanApiPlugin.class)
-@PluginDescriptor(name = "<html><font color=\"#ff6961\">Gorilitas</font></html>",
-tags = {"pajau"})
+@PluginDescriptor(
+        name = "<html>[<font color=\"#FA4444\">P</font>] Gorillas Alt Tank</html>",
+        tags = {"pajau"},
+        enabledByDefault = false
+)
 public class GorilasPlugin extends Plugin {
 
     @Inject

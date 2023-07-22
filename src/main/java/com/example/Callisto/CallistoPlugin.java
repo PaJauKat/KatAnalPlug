@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @Slf4j
 @PluginDescriptor(
-        name = "Callisto",
+        name = "<html>[<font color=\"#FA4444\">P</font>] Callisto</html>",
         enabledByDefault = false,
         tags = {"pajau"}
 )

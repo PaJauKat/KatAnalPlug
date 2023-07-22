@@ -38,7 +38,7 @@ public class TileObjectInteraction {
         if (comp == null) {
             return false;
         }
-        MousePackets.queueClickPacket();
+        //MousePackets.queueClickPacket();
         ObjectPackets.queueObjectAction(tileObject, false, actions);
         return true;
     }

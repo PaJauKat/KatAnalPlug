@@ -12,7 +12,7 @@ import javax.inject.Inject;
 
 @Slf4j
 @PluginDescriptor(
-		name = "<html><font color=\"#00ff00\">Pajau Constru</font></html>",
+		name = "<html>[<font color=\"#59D634\">P</font>] Pajau Constru</html>",
 		enabledByDefault = false,
 		tags = {"pajau"}
 )

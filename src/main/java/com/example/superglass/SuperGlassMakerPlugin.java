@@ -25,7 +25,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
 
-@PluginDescriptor(name = "<html><font color=\"#ff6961\">Super Glass Maker</font></html>", description = "", enabledByDefault = false, tags = {"ethan"})
+@PluginDescriptor(name = "<html>[<font color=\"#FA4444\">P</font>] Super Glass Maker</html>", description = "", enabledByDefault = false, tags = {"ethan","pajau"})
 @Slf4j
 @PluginDependency(PacketUtilsPlugin.class)
 @PluginDependency(EthanApiPlugin.class)

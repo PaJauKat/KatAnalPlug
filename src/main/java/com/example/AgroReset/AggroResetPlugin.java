@@ -32,8 +32,10 @@ import java.time.Instant;
 import java.util.Objects;
 
 @Slf4j
-@PluginDescriptor(name = "<html><font color=\"#ff6961\">Agro Reset</font></html>",
-    tags = {"pajau"}
+@PluginDescriptor(
+        name = "<html>[<font color=\"#FA4444\">P</font>] Aggro Reset</html>",
+        tags = {"pajau"},
+        enabledByDefault = false
 )
 @PluginDependency(NpcAggroAreaPlugin.class)
 public class AggroResetPlugin extends Plugin {

@@ -165,7 +165,6 @@ public class PacketDef {
         OPPLAYERT = new PacketDef(ObfuscatedNames.OPPLAYERT_OBFUSCATEDNAME, new LinkedHashMap<String, String>() {
             {
                 put(ObfuscatedNames.OPPLAYERT_WRITE1, ObfuscatedNames.OPPLAYERT_METHOD_NAME1);
-                put(ObfuscatedNames.OPPLAYERT_WRITE2, ObfuscatedNames.OPPLAYERT_METHOD_NAME2);
                 put(ObfuscatedNames.OPPLAYERT_WRITE3, ObfuscatedNames.OPPLAYERT_METHOD_NAME3);
                 put(ObfuscatedNames.OPPLAYERT_WRITE4, ObfuscatedNames.OPPLAYERT_METHOD_NAME4);
                 put(ObfuscatedNames.OPPLAYERT_WRITE5, ObfuscatedNames.OPPLAYERT_METHOD_NAME5);

@@ -36,8 +36,9 @@ import java.util.Objects;
 @Slf4j
 @Getter
 @PluginDescriptor(
-        name = "World Finder",
-        tags = {"pajau"}
+        name = "<html>[<font color=\"#59D634\">P</font>] World Finder</html>",
+        tags = {"pajau"},
+        enabledByDefault = false
 )
 public class WorldFinderPlugin extends Plugin {
 

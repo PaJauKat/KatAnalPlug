@@ -35,7 +35,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 
 
 @PluginDescriptor(
-        name = "Hydra Helper",
+        name = "<html>[<font color=\"#59D634\">P</font>] Hydra Helper</html>",
         enabledByDefault = false,
         description = "Overlays for normal Hydras.",
         tags = {"hydra", "helper", "baby", "small", "normal", "regular"}

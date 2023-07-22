@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.Random;
 
 @PluginDescriptor(
-        name = "<html><font color=\"#ff6961\">Robador</font></html>",
+        name = "<html>[<font color=\"#FA4444\">P</font>] Ardy knights</html>",
         enabledByDefault = false,
         tags = {"pajau","thieving","robador"}
 )

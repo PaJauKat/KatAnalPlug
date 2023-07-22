@@ -17,9 +17,10 @@ import javax.inject.Inject;
 
 @Slf4j
 @PluginDescriptor(
-        name = "Venenatis Helper",
+        name = "<html>[<font color=\"#59D634\">P</font>] Venenatis</html>",
         description = "Counts venenatis movements",
-        tags = {"pajau"}
+        tags = {"pajau"},
+        enabledByDefault = false
 )
 public class VenenatisPlugin extends Plugin {
     @Inject

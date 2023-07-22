@@ -34,7 +34,10 @@ import java.util.List;
 
 @Slf4j
 @PluginDescriptor(
-        name = "Dragonzovish")
+        name = "<html>[<font color=\"#FA4444\">P</font>] Green Dragons</html>",
+        tags = {"pajau","green","dragon"},
+        enabledByDefault = false
+)
 public class GreenDragsPlugin extends Plugin {
     @Inject
     private Client client;

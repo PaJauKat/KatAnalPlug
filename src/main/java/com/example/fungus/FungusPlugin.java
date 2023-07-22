@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @PluginDescriptor(
-        name = "Fungus anal",
+        name = "<html>[<font color=\"#FA4444\">P</font>] Mort myre fungus</html>",
         enabledByDefault = false,
         tags = {"pajau"}
 )
@@ -313,8 +313,8 @@ public class FungusPlugin extends Plugin {
                     Optional<Widget> teleOut = Inventory.search().withId(ItemID.TELEPORT_TO_HOUSE).first();
                     String action = "Break";
                     if (teleOut.isEmpty()) {
-                        teleOut = Inventory.search().withId(ItemID.ARDOUGNE_CLOAK_2).first();
-                        action = "Monastery Teleport";
+                        teleOut = Inventory.search().withId(ItemID.CONSTRUCT_CAPET).first();
+                        action = "Tele to POH";
                     }
                     if (teleOut.isPresent()) {
                         InventoryInteraction.useItem(teleOut.get(), action);

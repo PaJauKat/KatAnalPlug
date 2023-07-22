@@ -21,8 +21,9 @@ import java.time.Instant;
 import java.util.Arrays;
 
 @PluginDescriptor(
-        name = "<html><font color=\"#00ff00\">Tiempos CA</font></html>",
-        tags = {"pajau","timer","combat achievement"}
+        name = "<html>[<font color=\"#59D634\">P</font>] Tiempos CA</html>",
+        tags = {"pajau","timer","combat achievement"},
+        enabledByDefault = false
 )
 @Slf4j
 public class CaTimerPlugin extends Plugin {

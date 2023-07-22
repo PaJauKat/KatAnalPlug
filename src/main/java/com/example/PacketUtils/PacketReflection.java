@@ -53,7 +53,7 @@ public class PacketReflection {
             isaac2.setAccessible(false);
             PACKETWRITER.setAccessible(false);
             isaacClass = isaac.getClass();
-            getPacketBufferNode = Arrays.stream(classWithgetPacketBufferNode.getDeclaredMethods()).filter(m -> m.getReturnType().equals(PacketBufferNode)).collect(Collectors.toList()).get(0);
+            getPacketBufferNode = Arrays.stream(classWithgetPacketBufferNode.getDeclaredMethods()).filter(m -> m.getReturnType().equals(PacketBufferNode)).collect(Collectors.toList()).get(0); //method public static lm at()
             mouseHandlerLastPressedTime = clientInstance.getClass().getClassLoader().loadClass(ObfuscatedNames.MouseHandler_lastPressedTimeMillisClass).getDeclaredField(ObfuscatedNames.MouseHandler_lastPressedTimeMillisField);
             clientMouseLastLastPressedTimeMillis = clientInstance.getClass().getDeclaredField(ObfuscatedNames.clientMouseLastLastPressedTimeMillis);
         } catch (Exception e) {
@@ -67,41 +67,41 @@ public class PacketReflection {
     @SneakyThrows
     public static void writeObject(String obfname, Object buffer, Object input) {
         switch (obfname) {
-            case "ef":
-                BufferMethods.ef(buffer, (Integer) input);
+            case "eb":
+                BufferMethods.eb(buffer, (Integer) input);
                 break;
-            case "be":
-                BufferMethods.be(buffer, (Integer) input);
+            case "bu":
+                BufferMethods.bu(buffer, (Integer) input);
                 break;
-            case "dx":
-                BufferMethods.dx(buffer, (Integer) input);
+            case "dt":
+                BufferMethods.dt(buffer, (Integer) input);
                 break;
-            case "dy":
-                BufferMethods.dy(buffer, (Integer) input);
+            case "eh":
+                BufferMethods.eh(buffer, (Integer) input);
                 break;
-            case "ez":
-                BufferMethods.ez(buffer, (Integer) input);
+            case "ej":
+                BufferMethods.ej(buffer, (Integer) input);
                 break;
-            case "bw":
-                BufferMethods.bw(buffer, (Integer) input);
+            case "dl":  //bw
+                BufferMethods.dl(buffer, (Integer) input);
                 break;
-            case "bh":
-                BufferMethods.bh(buffer, (Integer) input);
+            case "bk":  //bh
+                BufferMethods.bk(buffer, (Integer) input);
                 break;
-            case "dj":
-                BufferMethods.dj(buffer, (Integer) input);
+            case "dv":  //dj
+                BufferMethods.dv(buffer, (Integer) input);
                 break;
-            case "dz":
-                BufferMethods.dz(buffer, (Integer) input);
+            case "cn":  //dz
+                BufferMethods.cn(buffer, (Integer) input);
                 break;
-            case "dk":
-                BufferMethods.dk(buffer, (Integer) input);
+            case "dh":  //dk
+                BufferMethods.dh(buffer, (Integer) input);
                 break;
-            case "em":
-                BufferMethods.em(buffer, (Integer) input);
+            case "bx":  //em
+                BufferMethods.bx(buffer, (Integer) input);
                 break;
-            case "do":
-                BufferMethods.doMethod(buffer, (Integer) input);
+            case "dm":  //do
+                BufferMethods.dm(buffer, (Integer) input);
                 break;
         }
     }
@@ -121,7 +121,7 @@ public class PacketReflection {
             packetBufferNode = getPacketBufferNode.invoke(null, fetchPacketField(def.name).get(ClientPacket),
                     isaac, Integer.parseInt(ObfuscatedNames.getPacketBufferNodeGarbageValue));
         }
-        Object buffer = packetBufferNode.getClass().getDeclaredField(ObfuscatedNames.packetBufferFieldName).get(packetBufferNode);
+        Object buffer = packetBufferNode.getClass().getDeclaredField(ObfuscatedNames.packetBufferFieldName).get(packetBufferNode); //public tl av; en lm.class
         getPacketBufferNode.setAccessible(false);
         List<String> params = null;
         if (def.type == PacketType.RESUME_PAUSEBUTTON) {
@@ -168,9 +168,11 @@ public class PacketReflection {
         }
         if (params != null) {
             for (Map.Entry<String, String> stringEntry : def.fields.entrySet()) {
-                if (params.contains(stringEntry.getKey())) {
+                if (params.contains(stringEntry.getKey())) { //ctrlDown
 
                     writeObject(stringEntry.getValue(), buffer, objects[params.indexOf(stringEntry.getKey())]);
+                    //write obj(dz ,hx.at(-,-,-) , ctrlDown);
+                    //write obj(donde, el buffer, valor a escribir);
                 }
             }
             PACKETWRITER.setAccessible(true);
@@ -206,7 +208,7 @@ public class PacketReflection {
         }
     }
 
-    public static void addNode(Object eqVar0, Object lmVar1) {
+    /*public static void addNode(Object eqVar0, Object lmVar1) {
         try {
             Class om = client.getClass().getClassLoader().loadClass("om");
             Field an = eqVar0.getClass().getDeclaredField("an");
@@ -228,6 +230,66 @@ public class PacketReflection {
             int total = thisAv.getInt(eqVar0);
             total += asField.getInt(lmVar1) * 1696608891;
             thisAv.set(eqVar0, total);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    /*public static void addNode(Object ebVar0, Object lvVar1) { //addNode(
+        try {
+            Field ay = ebVar0.getClass().getDeclaredField("ay");
+            ay.setAccessible(true);
+            Method aa = ay.get(ebVar0).getClass().getDeclaredMethod("aa",lvVar1.getClass().getSuperclass());
+            aa.setAccessible(true);
+            aa.invoke(ay.get(ebVar0),lvVar1);
+
+            Field ar = lvVar1.getClass().getDeclaredField("ar");
+            ar.setAccessible(true);
+            Field av = ar.get(lvVar1).getClass().getField("av"); //DeclaredField  -> Field()??
+            av.setAccessible(true);
+            Field am = lvVar1.getClass().getDeclaredField("am");
+            am.setAccessible(true);
+            am.set(lvVar1,av.getInt(ar.get(lvVar1)) * -1643463139);
+
+            av.set(ar.get(lvVar1), 0);
+
+            Field az = ebVar0.getClass().getDeclaredField("az");
+            az.setAccessible(true);
+            int meow = az.getInt(ebVar0);
+            //Field am = lvVar1.getClass().getDeclaredField("am");
+            az.set(ebVar0, meow + 1559877663 * am.getInt(lvVar1));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
+    public static void addNode(Object ebVar0, Object lvVar1) { //addNode(
+        try {
+            Class cq = client.getClass().getClassLoader().loadClass("cq");
+            Field ay = ebVar0.getClass().getDeclaredField("ay");
+            ay.setAccessible(true);
+            Method te = cq.getDeclaredMethod("te", ay.get(ebVar0).getClass(), lvVar1.getClass().getSuperclass());
+            te.setAccessible(true);
+            te.invoke(null,ay.get(ebVar0),lvVar1);
+
+            Field ar = lvVar1.getClass().getDeclaredField("ar");
+            ar.setAccessible(true);
+            Field av = ar.get(lvVar1).getClass().getField("av"); //DeclaredField  -> Field()??
+            av.setAccessible(true);
+            Field am = lvVar1.getClass().getDeclaredField("am");
+            am.setAccessible(true);
+            am.set(lvVar1,av.getInt(ar.get(lvVar1)) * -1643463139);
+
+            //av.set(ar.get(lvVar1), 0);
+
+            Field ap = ebVar0.getClass().getDeclaredField("ap");
+            ap.setAccessible(true);
+            int meow = ap.getInt(ebVar0);
+            //Field am = lvVar1.getClass().getDeclaredField("am");
+            Field ay2 = lvVar1.getClass().getDeclaredField("ay");
+            ay2.setAccessible(true);
+            ap.set(ebVar0, meow + 1559877663 * ay2.getInt(lvVar1));
+
         } catch (Exception e) {
             e.printStackTrace();
         }

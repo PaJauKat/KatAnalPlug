@@ -153,6 +153,7 @@ public class NexSimplePlugin extends Plugin {
     }
 
 
+    private int alert = 0;
 
 
     @Subscribe
@@ -162,6 +163,8 @@ public class NexSimplePlugin extends Plugin {
             timeout--;
             return;
         }
+
+
 
         if (estado.isEnPelea()) {
             if (potTimeout > 0) {

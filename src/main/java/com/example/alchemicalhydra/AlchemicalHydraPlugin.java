@@ -45,7 +45,7 @@ import net.runelite.client.ui.overlay.OverlayManager;
 @Slf4j
 @Singleton
 @PluginDescriptor(
-        name = "Alchemical Hydra",
+        name = "<html>[<font color=\"#59D634\">P</font>] Alchemical Hydra</html>",
         enabledByDefault = false,
         description = "A plugin for the Alchemical Hydra boss.",
         tags = {"alchemical", "hydra"}
