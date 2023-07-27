@@ -141,7 +141,7 @@ public class BufferMethods {
     }
 
     @SneakyThrows
-    public static void bx(Object bufferInstance, int writtenValue) {
+    public static void bx(Object bufferInstance, int writtenValue) {    //dl
         Field arrayField = bufferInstance.getClass().getField(ObfuscatedNames.bufferArrayField);
         Field offsetField = bufferInstance.getClass().getField(ObfuscatedNames.bufferOffsetField);
         arrayField.setAccessible(true);

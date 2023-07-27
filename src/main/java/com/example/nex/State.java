@@ -1,4 +1,4 @@
-package com.example.nexSimple;
+package com.example.nex;
 
 import lombok.Getter;
 
@@ -13,7 +13,11 @@ public enum State {
     CRUOR(true),
     FASE_4(true),
     GLACIES(true),
-    FASE_5(true);
+    FASE_5(true),
+    STARTING(false),
+    GETTING_KC(false),
+    LOOTING(false),
+    BANKING(false);
 
     @Getter
     private boolean enPelea;

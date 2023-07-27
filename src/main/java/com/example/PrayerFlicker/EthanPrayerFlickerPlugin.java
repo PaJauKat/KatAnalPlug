@@ -53,7 +53,7 @@ public class EthanPrayerFlickerPlugin extends Plugin {
     }
 
     private void togglePrayer() {
-        //MousePackets.queueClickPacket();
+        MousePackets.queueClickPacket();
         WidgetPackets.queueWidgetActionPacket(1, quickPrayerWidgetID, -1, -1);
     }
 

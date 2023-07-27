@@ -2,11 +2,13 @@ package com.example.spec;
 
 import com.example.Packets.MousePackets;
 import com.example.Packets.WidgetPackets;
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.KeyCode;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.config.Keybind;
 import net.runelite.client.input.KeyListener;
 import net.runelite.client.input.KeyManager;
@@ -16,11 +18,12 @@ import net.runelite.client.util.HotkeyListener;
 
 import javax.inject.Inject;
 import java.awt.event.KeyEvent;
+import java.io.ObjectInputFilter;
 
 
 @Slf4j
 @PluginDescriptor(
-        name = "Special anal",
+        name = "<html>[<font color=\"#FA4444\">P</font>] Special anal</html>",
         tags = {"pajau"}
 )
 public class SpecPlugin extends Plugin {
@@ -34,6 +37,14 @@ public class SpecPlugin extends Plugin {
     @Inject
     private ClientThread clientThread;
 
+    @Inject
+    private SpecConfig specConfig;
+
+    @Provides
+    SpecConfig getConfig(ConfigManager configManager){
+        return configManager.getConfig(SpecConfig.class);
+    }
+
 
     @Override
     protected void startUp() throws Exception {
@@ -46,7 +57,7 @@ public class SpecPlugin extends Plugin {
     }
 
 
-    private KeyListener botonSpec = new HotkeyListener(() -> new Keybind(KeyEvent.VK_F8, 0)) {
+    private KeyListener botonSpec = new HotkeyListener(() -> specConfig.keySpec()) {
 
         @Override
         public void hotkeyPressed() {

@@ -7,8 +7,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Probando {
+    //static boolean eb = false;
+    //public static final eb id;
     public static void main(String[] args) {
-        List<Integer> katarina = new ArrayList<>();
-        System.out.println(katarina.stream().min(Comparator.comparingInt(Integer::intValue)).get());
+        eb.so(1);
+
     }
 }

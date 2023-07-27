@@ -25,7 +25,7 @@ import com.example.fungus.FungusPlugin;
 import com.example.gauntletFlicker.gauntletFlicker;
 import com.example.harpoon2ticker.SwordFish2Tick;
 import com.example.hydra.HydraPlugin;
-import com.example.nexSimple.NexSimplePlugin;
+import com.example.nex.NexPlugin;
 import com.example.spec.SpecPlugin;
 import com.example.superglass.SuperGlassMakerPlugin;
 import com.example.theatre.TheatrePlugin;
@@ -42,9 +42,9 @@ public class ExamplePluginTest {
                 NightmareHelperPlugin.class, SwordFish2Tick.class
                 , e3t4g.class, AutoTele.class,
                 TheatrePlugin.class, ToacitoPlugin.class, RobadorPlugin.class, GreenDragsPlugin.class, GorilasPlugin.class,
-                CaTimerPlugin.class, CallistoPlugin.class, FaldaPlugin.class, AggroResetPlugin.class, NexSimplePlugin.class,
+                CaTimerPlugin.class, CallistoPlugin.class, FaldaPlugin.class, AggroResetPlugin.class,
                 VenenatisPlugin.class, Blackjacking.class, FungusPlugin.class, HydraPlugin.class,
-                CrabsPlugin.class, BlastFurnacePlugin.class,
+                CrabsPlugin.class, BlastFurnacePlugin.class, NexPlugin.class,
                 CookerPlugin.class, WorldFinderPlugin.class, SpecPlugin.class
                 );
         RuneLite.main(args);

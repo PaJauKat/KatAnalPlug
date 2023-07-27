@@ -206,7 +206,7 @@ public class PacketReflection {
         }
     }
 
-    public static void addNode(Object eqVar0, Object lmVar1) {
+    /*public static void addNode(Object eqVar0, Object lmVar1) {
         try {
             Field ay = eqVar0.getClass().getDeclaredField("ay");
             ay.setAccessible(true);
@@ -225,6 +225,7 @@ public class PacketReflection {
             avField.setAccessible(true);
             int amValue = -1643463139 * avField.getInt(arObject);
             var1ay.setInt(lmVar1, amValue);
+
             avField.setInt(arObject, 0);
 
             Field var0ar = eqVar0.getClass().getDeclaredField("ar");
@@ -244,6 +245,36 @@ public class PacketReflection {
             arField.setAccessible(false);
             ay.setAccessible(false);
             te.setAccessible(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }*/
+
+    public static void addNode(Object ebVar0, Object lvVar1) {
+        try {
+            Class cq = client.getClass().getClassLoader().loadClass("cq");
+            Field ay = ebVar0.getClass().getDeclaredField("ay");
+            ay.setAccessible(true);
+            //Method te = cq.getDeclaredMethod("te", ebVar0.getClass().getDeclaredField("ay").getClass(), lvVar1.getClass().getSuperclass());// creo q me devuelve eb.class
+            Method te = cq.getDeclaredMethod("te", ay.get(ebVar0).getClass(), lvVar1.getClass().getSuperclass());
+            te.setAccessible(true);
+            te.invoke(null, ay.get(ebVar0), lvVar1);
+
+            Field ayVar1 = lvVar1.getClass().getDeclaredField("ay");
+            ayVar1.setAccessible(true);
+            Field arVar1 = lvVar1.getClass().getDeclaredField("ar");
+            arVar1.setAccessible(true);
+            Field av = arVar1.get(lvVar1).getClass().getField("av");
+            av.setAccessible(true);
+            ayVar1.set(lvVar1,-1643463139 * av.getInt(arVar1.get(lvVar1)) );
+
+            av.set(arVar1.get(lvVar1),0);
+
+            Field arVar0 = ebVar0.getClass().getDeclaredField("ar");
+            arVar0.setAccessible(true);
+            int meow = arVar0.getInt(ebVar0);
+            arVar0.set(ebVar0,meow + 1559877663 * ayVar1.getInt(lvVar1));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
