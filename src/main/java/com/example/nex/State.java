@@ -17,7 +17,9 @@ public enum State {
     STARTING(false),
     GETTING_KC(false),
     LOOTING(false),
-    BANKING(false);
+    BANKING(false),
+    RECOVERY(false),
+    RECOGNIZER(false);
 
     @Getter
     private boolean enPelea;

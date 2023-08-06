@@ -29,6 +29,7 @@ import com.example.nex.NexPlugin;
 import com.example.spec.SpecPlugin;
 import com.example.superglass.SuperGlassMakerPlugin;
 import com.example.theatre.TheatrePlugin;
+import com.example.vardorvis.VardorvisPlugin;
 import com.example.venenatis.VenenatisPlugin;
 import com.example.worldFinder.WorldFinderPlugin;
 import net.runelite.client.RuneLite;
@@ -45,7 +46,7 @@ public class ExamplePluginTest {
                 CaTimerPlugin.class, CallistoPlugin.class, FaldaPlugin.class, AggroResetPlugin.class,
                 VenenatisPlugin.class, Blackjacking.class, FungusPlugin.class, HydraPlugin.class,
                 CrabsPlugin.class, BlastFurnacePlugin.class, NexPlugin.class,
-                CookerPlugin.class, WorldFinderPlugin.class, SpecPlugin.class
+                CookerPlugin.class, WorldFinderPlugin.class, SpecPlugin.class, VardorvisPlugin.class
                 );
         RuneLite.main(args);
     }

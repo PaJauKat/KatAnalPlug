@@ -12,11 +12,16 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public enum TilePelea {
-    CRABS_3(List.of(new WorldPoint(1776,3468,0), new WorldPoint(1773,3461,0) ) ),
-    CRABS_2(List.of(new WorldPoint(1774,3470,0)) ),
-    CRABS_4(List.of(new WorldPoint(1765,3468,0)))
+    CRABS_3("3" ,List.of(new WorldPoint(1776,3468,0), new WorldPoint(1773,3461,0) ,new WorldPoint(1749,3469,0) ) ),
+    CRABS_2("2" ,List.of(new WorldPoint(1791,3468,0)) ),
+    CRABS_4("4" ,List.of(new WorldPoint(1765,3468,0)))
     ;
 
+    private final String nCrabs;
     private final List<WorldPoint> puntos;
 
+    @Override
+    public String toString() {
+        return nCrabs;
+    }
 }

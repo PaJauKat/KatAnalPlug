@@ -206,7 +206,7 @@ public class PacketReflection {
         }
     }
 
-    public static void addNode(Object eqVar0, Object lmVar1) {
+    /*public static void addNode(Object eqVar0, Object lmVar1) {
         try {
             Field ay = eqVar0.getClass().getDeclaredField("ay");
             ay.setAccessible(true);
@@ -225,6 +225,7 @@ public class PacketReflection {
             avField.setAccessible(true);
             int amValue = -1643463139 * avField.getInt(arObject);
             am.setInt(lmVar1, amValue);
+
             avField.setInt(arObject, 0);
 
             Field var0ap = eqVar0.getClass().getDeclaredField("ap");
@@ -247,7 +248,46 @@ public class PacketReflection {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }*/
+
+
+    public static void addNode(Object ebVar0, Object lvVar1) {
+        try {
+            Field ay = ebVar0.getClass().getDeclaredField("ay");
+            ay.setAccessible(true);
+            Class or = ay.get(ebVar0).getClass();
+            Method eo = or.getDeclaredMethod("eo", or ,lvVar1.getClass().getSuperclass());
+            eo.setAccessible(true);
+            eo.invoke(null, ay.get(ebVar0),lvVar1);
+
+            Field ayVar1 = lvVar1.getClass().getDeclaredField("ay");
+            ayVar1.setAccessible(true);
+            Field ar = lvVar1.getClass().getDeclaredField("ar");
+            ar.setAccessible(true);
+            Field av = ar.get(lvVar1).getClass().getField("av");
+            av.setAccessible(true);
+            ayVar1.setInt(lvVar1,-1643463139 * av.getInt(ar.get(lvVar1)));
+
+            av.setInt(ar.get(lvVar1), 0);
+
+            Field arVar0 = ebVar0.getClass().getDeclaredField("ar");
+            arVar0.setAccessible(true);
+            int mult = 1559877663 * ayVar1.getInt(lvVar1);
+            arVar0.setInt(ebVar0, arVar0.getInt(ebVar0) + mult);
+
+            ay.setAccessible(false);
+            eo.setAccessible(false);
+            ayVar1.setAccessible(false);
+            ar.setAccessible(false);
+            av.setAccessible(false);
+            arVar0.setAccessible(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
+
+
 
 //    @SneakyThrows
 //    static Object getPacketBufferNode(Object clientPacket, Object isaacCipher) {

@@ -11,6 +11,7 @@ import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
 import java.util.List;
+import java.util.Locale;
 
 @ConfigGroup("nexAnal")
 public interface NexConfig extends Config {
@@ -82,6 +83,12 @@ public interface NexConfig extends Config {
     }
 
     @ConfigItem(
+            name = "Thralls",
+            keyName = "thralls",
+            description = ""
+    )default boolean thralls(){return false;}
+
+    @ConfigItem(
             name = "Wait for Master",
             keyName = "waitForMaster",
             description = "It will enter if master is at portal"
@@ -92,7 +99,27 @@ public interface NexConfig extends Config {
             keyName = "masterName",
             description = ""
     )default String masterName(){return "Putita";}
+
+    @ConfigItem(
+            name = "Panties down",
+            keyName = "pantiesDown",
+            description = "Removes panties at last phase, so your master can do other things"
+    )default boolean pantiesDown(){return false;}
+
+    @ConfigItem(
+            name = "Tits out",
+            keyName = "titsOut",
+            description = "Removes your top wearing"
+    )default boolean titsOut(){return false;}
     //BANK SECTION---------------------------------------------------------
+
+    @ConfigItem(
+            name = "Should Bank",
+            keyName = "shouldBank",
+            description = "",
+            section = bankSection
+    )default boolean shouldBank(){return true;}
+
     @ConfigItem(
             name = "Bank anal",
             keyName = "bankAnal",
@@ -129,6 +156,13 @@ public interface NexConfig extends Config {
     )default int combatAmount(){return 2;}
 
     //Pre-Pot section--------------------------------------
+
+    @ConfigItem(
+            name = "Should Pre-pot",
+            keyName = "shouldPrepot",
+            description = "",
+            section = prePotSection
+    )default boolean shouldPrepot() {return true;}
 
     @ConfigItem(
             name = "Imbued Heart",
@@ -168,7 +202,13 @@ public interface NexConfig extends Config {
             section = prePotSection
     )default boolean menaphitePre(){return true;}
 
+    //RECOVERY----------------------------------------------------------
 
+    @ConfigItem(
+            name = "Recovery food ID",
+            keyName = "recoveryFoodId",
+            description = ""
+    )default int recoveryFoodId(){return 363;}
 
     //POTION SECTION-------------------------------------------------------
 
@@ -289,6 +329,13 @@ public interface NexConfig extends Config {
         return RangeWep.TEN;
     }
 
+    @ConfigItem(
+            name = "Weapond 2h?",
+            keyName = "wep2h",
+            description = "Ranged weapon uses 2 hands?",
+            section = rangedGear
+    )default boolean wep2h(){return true;}
+
 
     //Melee SECTION-------------------------------------------------------
     @ConfigItem(
@@ -311,6 +358,25 @@ public interface NexConfig extends Config {
     )
     default String meleeGear() {
         return "";
+    }
+
+    @ConfigItem(
+            name = "Melee Wep ID",
+            keyName = "meleeWepID",
+            description = "Melee weapond used for Stalagmites",
+            section = meleeGear,
+            position = 3
+    )default int meleeWepID() {return 27246;}
+
+    @ConfigItem(
+            name = "Fetch wep melee",
+            keyName = "fetchWepMelee",
+            description = "",
+            section = meleeGear,
+            position = 4
+    )
+    default boolean fetchWepMelee() {
+        return false;
     }
 
     //Spec SECTION-------------------------------------------------------
@@ -459,6 +525,13 @@ public interface NexConfig extends Config {
             description = "",
             section = kcSection
     )default Style kcStyle(){return Style.RANGED;}
+
+    @ConfigItem(
+            name = "Loot",
+            keyName = "kcLoot",
+            description = "",
+            section = kcSection
+    )default boolean kcLoot(){return false;}
 
 
     enum modo {

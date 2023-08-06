@@ -1,5 +1,6 @@
 package com.example.nex;
 
+import com.example.PajauApi.PajauApiPlugin;
 import com.sun.jna.platform.win32.WinBase;
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
@@ -17,6 +18,8 @@ public class NexOverlay extends Overlay {
     private NexPlugin nexPlugin;
     @Inject
     private Client client;
+
+    private int counter = 0;
 
     @Inject
     NexOverlay(NexPlugin plugin,Client clt) {
@@ -42,6 +45,26 @@ public class NexOverlay extends Overlay {
             OverlayUtil.renderTextLocation(graphics,puntoTex,"Anal",Color.ORANGE);
 
         }
+
+        if (PajauApiPlugin.tilesBuscados.size()>0) {
+            counter++;
+            if (counter >= 300) {
+                counter = 0;
+                PajauApiPlugin.tilesBuscados.clear();
+                return null;
+            }
+            for (WorldPoint p : PajauApiPlugin.tilesBuscados) {
+                LocalPoint lp = LocalPoint.fromWorld(client, p);
+                if (lp == null) {
+                    return null;
+                }
+                Polygon poly = Perspective.getCanvasTilePoly(client, lp);
+                OverlayUtil.renderPolygon(graphics,poly,Color.red);
+            }
+
+
+        }
+
         /*if (nexPlugin.getTileBuscados().size() > 0) {
             for (WorldPoint p : nexPlugin.getTileBuscados()) {
                 LocalPoint lp = LocalPoint.fromWorld(client, p);

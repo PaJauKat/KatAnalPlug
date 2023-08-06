@@ -24,6 +24,7 @@ import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDependency;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.plugins.npcunaggroarea.NpcAggroAreaPlugin;
+import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.HotkeyListener;
 import net.runelite.client.util.WorldUtil;
@@ -69,6 +70,12 @@ public class CrabsPlugin extends Plugin {
     @Inject
     private WorldService worldService;
 
+    @Inject
+    private CrabsOverlay crabsOverlay;
+
+    @Inject
+    private OverlayManager overlayManager;
+
     private GeneralPath AreaSafe;
     private boolean reseteando=false;
     private int timeout=-1;
@@ -76,6 +83,8 @@ public class CrabsPlugin extends Plugin {
     private int llave;
     private final Color pint=Color.magenta;
     private Estados estado = Estados.STARTING;
+
+    protected final int MAX_DISTANT = 14;//15en realidad pero para dejar un margen
 
     enum Estados{
         STARTING,
@@ -93,6 +102,7 @@ public class CrabsPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
+        this.overlayManager.add(crabsOverlay);
         keyManager.registerKeyListener(caminador);
         reseteando=false;
         enAccion=false;
@@ -102,6 +112,8 @@ public class CrabsPlugin extends Plugin {
 
     @Override
     protected void shutDown() throws Exception {
+        keyManager.unregisterKeyListener(caminador);
+        this.overlayManager.remove(crabsOverlay);
         reseteando=false;
         enAccion=false;
         tilePelea=null;
@@ -220,6 +232,9 @@ public class CrabsPlugin extends Plugin {
             if (mundoActual == 0) {
                 tilePelea = null;
                 for (WorldPoint wp : config.spot().getPuntos()) {
+                    if (wp.distanceTo(playerPoint) > MAX_DISTANT) {
+                        continue;
+                    }
                     if (client.getPlayers().stream().noneMatch( x -> x.getWorldLocation().isInArea(toWorldArea(wp, 2)))  ) {
                         tilePelea = wp;
                         break;

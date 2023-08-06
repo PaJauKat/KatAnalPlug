@@ -53,7 +53,7 @@ public class EquipmentItemQuery {
     }
 
     public EquipmentItemQuery indexIs(int index) {
-        items = items.stream().filter(item -> item.getIndex() == index).collect(Collectors.toList());
+        items = items.stream().filter(item -> item.getEquipmentIndex() == index).collect(Collectors.toList());
         return this;
     }
 

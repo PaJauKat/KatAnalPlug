@@ -1,13 +1,14 @@
 package com.example.nex;
 
 import com.example.EthanApiPlugin.Collections.*;
-import com.example.EthanApiPlugin.EthanApiPlugin;
 import com.example.InteractionApi.*;
 import com.example.PacketUtils.WidgetInfoExtended;
 import com.example.Packets.*;
 import com.example.PajauApi.PajauApiPlugin;
 import com.google.inject.Provides;
+import com.sun.jna.IntegerType;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.coords.*;
@@ -21,7 +22,6 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.input.KeyManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.client.plugins.itemstats.food.Anglerfish;
 import net.runelite.client.ui.overlay.OverlayManager;
 import net.runelite.client.util.ColorUtil;
 import net.runelite.client.util.Text;
@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
         enabledByDefault = false
 )
 public class NexPlugin extends Plugin {
+
     @Inject
     private Client client;
 
@@ -61,6 +62,9 @@ public class NexPlugin extends Plugin {
     @Inject
     private NexOverlay nexOverlay;
 
+    @Inject
+    private NexOverlayPanel nexOverlayPanel;
+
 
 
     @Provides
@@ -68,13 +72,115 @@ public class NexPlugin extends Plugin {
         return (NexConfig) configManager.getConfig(NexConfig.class);
     }
 
+    private boolean entranding = false;
+    private NPC fumus;
+    private NPC umbra;
+    private NPC bloodReaver;
+    private NPC cruor;
+    private NPC glacies;
+    private boolean encendido = false;
+    private int timeout = 0;
+    private NPC nex;
+    private List<GameObject> estalagmitas = new ArrayList<>();
+    private List<Integer> meleeGearIDs = new ArrayList<>();
+    private List<Integer> rangedGearIDs = new ArrayList<>();
+    private List<Integer> specGearIDs = new ArrayList<>();
+    private List<Integer> kcGearIDs = new ArrayList<>();
+    private int potTimeout = 0;
+    private List<GameObject> weaNegra = new ArrayList<>();
+    private int thereIs = 0;
+    private int containThis = 0;
+    private boolean specing = false;
+    private int alert = 0;
+    private int cough = 0;
+    private boolean healing = false;
+    private int bloodSacrifice = 0;
+    private int prisionero = 0;
+    private List<Widget> remain = new ArrayList<>();
+    private List<Widget> items2bank = new ArrayList<>();
+    private ListIterator<Widget> items2bankIterator;
+    private List<Integer> itemsBuenos = new ArrayList<>();
+    private int dropIndex = 0;
+    private int darkness = 0;
+    private boolean walkUnder = false;
+    private boolean mierdaDepositada = false;
+    private int runBitch = 0;
+    private int aloneTimer = 0;
+    private int piernasID = -1;
+    private int torsoID = -1;
+    private List<Widget> itemsNaqVer;
+    private boolean itemChekeados = false;
+    private List<Integer> equipFaltante = new ArrayList<>();
+    private List<List<Object>> suppFaltante = new ArrayList<>();
+    private boolean invChecked4Gear= false;
+    private List<Widget> gearInInven = new ArrayList<>();
+    private int stalagmiteCount = 0;
 
+    @Getter
+    private State estado = State.APAGADO;
+
+    @Getter
+    private WorldPoint escapeTile = null;
+
+    @Getter
+    private List<WorldPoint> tileBuscados = new ArrayList<>();
+
+
+    void reset() {
+        alert = 0;
+        cough = 0;
+        healing = false;
+        bloodSacrifice = 0;
+        specing = false;
+        containThis = 0;
+        thereIs = 0;
+        prisionero = 0;
+        tileBuscados = new ArrayList<>();
+        escapeTile = null;
+        weaNegra = new ArrayList<>();
+        potTimeout = 0;
+        estalagmitas = new ArrayList<>();
+        dropIndex = 0;
+        remain = new ArrayList<>();
+        darkness = 0;
+        walkUnder = false;
+        cc = 0;
+        nn = 0;
+        supp = new ArrayList<>();
+        prePot = new ArrayList<>();
+        mierdaDepositada = false;
+        itemsBuenos = new ArrayList<>();
+        entranding = false;
+        runBitch = 0;
+        aloneTimer = 0;
+        piernasID = -1;
+        torsoID = -1;
+        itemChekeados = false;
+        equipFaltante = new ArrayList<>();
+        suppFaltante = new ArrayList<>();
+        invChecked4Gear= false;
+        gearInInven = new ArrayList<>();
+        stalagmiteCount = 0;
+
+
+        fumus = null;
+        umbra = null;
+        bloodReaver = null;
+        cruor = null;
+        glacies = null;
+        timeout = 0;
+        nex = null;
+    }
+
+
+    //-----------------------CONSTANTS--------------------------------------------------
     private final Random N = new Random();
 
+    private static final int CONTAIN_THIS_DURATION = 14;
     private final int PORTAL_CLOSED = 42968;
     private final int PORTAL_OPEN = 42967;
     private final int POT_TIMEOUT = 2;
-    private final WorldPoint DUNGEON_TILE = new WorldPoint(2912, 5190,0);
+    private final WorldPoint DUNGEON_TILE = new WorldPoint(2912, 5190, 0);
     private final WorldPoint CENTER_TILE = new WorldPoint(2925, 5203, 0);
     private final int STALAGMITE_ID_PRISON = 42944;
 
@@ -101,11 +207,6 @@ public class NexPlugin extends Plugin {
             new WorldPoint(2923, 5213, 0),
             new WorldPoint(2927, 5213, 0),
     };
-
-    final WorldPoint[] tilesUmbra = {
-
-    };
-
 
     final WorldArea umbraAttackArea = new WorldArea(2927, 5205, 11, 11, 0);
     private final List<Integer> NEX_IDS = List.of(
@@ -141,86 +242,13 @@ public class NexPlugin extends Plugin {
     );
 
     private final WorldArea areaMasterPortal = new WorldArea(2908, 5202, 1, 3, 0);
+    private final int FUMUS_ID = 11283;
+    private final int UMBRA_ID = 11284;
+    private final int CRUOR_ID = 11285;
+    private final int GLACIES_ID = 11286;
+    private final int REAVER_ID = 0;
+    private final WorldArea lobbyArea = new WorldArea(2900, 5199, 9, 9, 0);
 
-    //-----------------------------------Variables---------------------------------
-    private NPC fumus;
-    private NPC umbra;
-    private NPC bloodReaver;
-    private NPC cruor;
-    private NPC glacies;
-    private boolean encendido = false;
-    private State estado = State.APAGADO;
-    private int timeout = 0;
-    private NPC nex;
-    private List<GameObject> estalagmitas = new ArrayList<>();
-    private List<Integer> meleeGearIDs = new ArrayList<>();
-    private List<Integer> rangedGearIDs = new ArrayList<>();
-    private List<Integer> specGearIDs = new ArrayList<>();
-    private List<Integer> kcGearIDs = new ArrayList<>();
-    private int potTimeout = 0;
-
-
-    private List<GameObject> weaNegra = new ArrayList<>();
-
-    @Getter
-    private WorldPoint escapeTile = null;
-
-    @Getter
-    private List<WorldPoint> tileBuscados = new ArrayList<>();
-
-    private int thereIs = 0;
-    private int containThis = 0;
-    private boolean specing = false;
-    private int alert = 0;
-
-    private int cough = 0;
-
-    private boolean healing = false;
-    private int bloodSacrifice = 0;
-    private int prisionero = 0;
-    private List<Widget> remain = new ArrayList<>();
-    private List<Widget> items2bank = new ArrayList<>();
-    private ListIterator<Widget> items2bankIterator;
-    private List<Integer> itemsBuenos = new ArrayList<>();
-    private int dropIndex = 0;
-    private int darkness = 0;
-    private boolean walkUnder = false;
-    private boolean mierdaDepositada = false;
-
-
-    void reset() {
-        alert = 0;
-        cough = 0;
-        healing = false;
-        bloodSacrifice = 0;
-        specing = false;
-        containThis = 0;
-        thereIs = 0;
-        prisionero = 0;
-        tileBuscados = new ArrayList<>();
-        escapeTile = null;
-        weaNegra = new ArrayList<>();
-        potTimeout = 0;
-        estalagmitas = new ArrayList<>();
-        dropIndex = 0;
-        remain = new ArrayList<>();
-        darkness = 0;
-        walkUnder = false;
-        cc = 0;
-        nn = 0;
-        supp = new ArrayList<>();
-        prePot = new ArrayList<>();
-        mierdaDepositada = false;
-        itemsBuenos = new ArrayList<>();
-
-        fumus = null;
-        umbra = null;
-        bloodReaver = null;
-        cruor = null;
-        glacies = null;
-        timeout = 0;
-        nex = null;
-    }
 
     boolean checkGearIds() {
         if (!config.meleeGear().equals("")) {
@@ -234,13 +262,13 @@ public class NexPlugin extends Plugin {
         }
 
         if (meleeGearIDs.size() == 0) {
-            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Melee gear not found", Color.red),"");
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Melee gear not found", Color.red), "");
         }
         if (rangedGearIDs.size() == 0) {
-            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Ranged gear not found", Color.red),"");
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Ranged gear not found", Color.red), "");
         }
         if (specGearIDs.size() == 0) {
-            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Spec gear not found", Color.red),"");
+            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Spec gear not found", Color.red), "");
         }
 
         if (meleeGearIDs.size() == 0 || rangedGearIDs.size() == 0 || specGearIDs.size() == 0) {
@@ -253,8 +281,7 @@ public class NexPlugin extends Plugin {
     }
 
 
-
-
+    @SneakyThrows
     @Subscribe
     void onConfigChanged(ConfigChanged event) {
         if (event.getGroup().equals("nexAnal")) {
@@ -270,11 +297,11 @@ public class NexPlugin extends Plugin {
                             if (config.mode() == NexConfig.modo.KC) {
                                 estado = State.GETTING_KC;
                             } else if (config.mode() == NexConfig.modo.NEX) {
-                                estado = State.ENTRAR;
+                                estado = State.RECOVERY;
                             }
                             client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Prendido", Color.green), "");
                         } else {
-                            estado = State.STARTING;
+                            estado = State.APAGADO;
                             encendido = false;
                             client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Couldn't turn on", Color.green), "");
                         }
@@ -292,7 +319,7 @@ public class NexPlugin extends Plugin {
                 configManager.setConfiguration("nexAnal", "rangedGear", gearIDsString.toString());
 
                 clientThread.invokeLater(() -> {
-                    client.addChatMessage(ChatMessageType.GAMEMESSAGE,"", rangedGear.size() +" anal","");
+                    client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", rangedGear.size() + " anal", "");
                     configManager.sendConfig();
                     configManager.load();
                 });
@@ -340,7 +367,26 @@ public class NexPlugin extends Plugin {
                     configManager.sendConfig();
                     configManager.load();
                 });
+            } else if (event.getKey().equals("fetchWepMelee")) {
+                clientThread.invoke(() -> client.runScript(545, 25362450, 3, 1, 1, 2));
+                Widget wepSlot = client.getWidget(25362450);
+                if (wepSlot == null) {
+                    return;
+                }
+                if (wepSlot.getChild(1) == null) {
+                    return;
+                }
+                int wepId = wepSlot.getChild(1).getItemId();
+
+                configManager.setConfiguration("nexAnal", "meleeWepID", wepId);
+
+                clientThread.invokeLater(() -> {
+                    configManager.sendConfig();
+                    configManager.load();
+                });
             }
+
+
         }
     }
 
@@ -348,7 +394,8 @@ public class NexPlugin extends Plugin {
     @Override
     protected void startUp() throws Exception {
         this.overlayManager.add(nexOverlay);
-        estado = State.STARTING;
+        this.overlayManager.add(nexOverlayPanel);
+        estado = State.APAGADO;
         encendido = false;
         if (!config.meleeGear().equals("")) {
             meleeGearIDs = Arrays.stream(config.meleeGear().split(",")).map(Integer::parseInt).collect(Collectors.toList());
@@ -369,11 +416,11 @@ public class NexPlugin extends Plugin {
     @Override
     protected void shutDown() throws Exception {
         this.overlayManager.remove(nexOverlay);
+        this.overlayManager.remove(nexOverlayPanel);
         estado = State.APAGADO;
         encendido = false;
         reset();
     }
-
 
 
     private boolean lowHP(int hpTrigger) {
@@ -387,13 +434,6 @@ public class NexPlugin extends Plugin {
     public boolean isIdle(NPC mono) {
         return mono.getIdlePoseAnimation() == mono.getPoseAnimation();
     }
-
-    private final int FUMUS_ID = 11283;
-    private final int UMBRA_ID = 11284;
-    private final int CRUOR_ID = 11285;
-    private final int GLACIES_ID = 11286;
-    private final int REAVER_ID = 0;
-    private final WorldArea lobbyArea = new WorldArea(2900, 5199, 9, 9, 0);
 
 
     void checkMeleeGear() {
@@ -418,35 +458,50 @@ public class NexPlugin extends Plugin {
         }
     }
 
-    void checkGear(String stilo) {
-        List<Integer> IDs;
+    void checkGear(String stilo,List<Integer> exceptions) {
+        List<Integer> IDs = new ArrayList<>();
         if (stilo.equals("ranged")) {
-            IDs = rangedGearIDs;
+            IDs.addAll(rangedGearIDs);
         } else if (stilo.equals("melee")) {
-            IDs = meleeGearIDs;
-        }else{
-            IDs = specGearIDs;
+            IDs.addAll(meleeGearIDs);
+        } else if (stilo.equals("spec")) {
+            IDs.addAll(specGearIDs);
+        } else if (stilo.equals("wepMelee")) {
+            IDs.add(config.meleeWepID());
+        } else {
+            log.info("gear no identificada");
+            return;
         }
+
+        if (exceptions.size() > 0) {
+            for (int ex : exceptions) {
+                if (ex != -1) {
+                    IDs.removeIf(x -> x == ex);
+                }
+            }
+        }
+
         List<Widget> gearInInventory = Inventory.search().idInList(IDs).result();
-        //log.info("size gear: {}",gearInInventory.size());
         if (gearInInventory.size() > 0) {
-            log.info("equipando");
+            log.info("equipando " + stilo);
             for (Widget item : gearInInventory) {
                 WidgetPackets.queueWidgetActionPacket(3, item.getId(), item.getItemId(), item.getIndex());
             }
         }
     }
 
+    void checkGear(String stilo) {
+        checkGear(stilo, new ArrayList<>());
+    }
+
     void checkPrayer(Prayer prayer) {
         if (client.getVarbitValue(prayer.getVarbit()) != 1) {
             log.info("Prendiendo {}", prayer.name());
-            //InteractionHelper.toggleNormalPrayer(35454997);
             InteractionHelper.toggleNormalPrayer(WidgetInfoExtended.valueOf("PRAYER_" + prayer.name()).getPackedId());
         }
     }
 
     void checkBoost(Skill skill) {
-
         if (potTimeout > 0) {
             return;
         }
@@ -462,7 +517,7 @@ public class NexPlugin extends Plugin {
                 InventoryInteraction.useItem(pot.get(), "Drink");
                 potTimeout = 2;
             } else {
-                //log.info("No se encontro boost potion");
+                log.info("No se encontro boost potion");
             }
         }
     }
@@ -526,11 +581,14 @@ public class NexPlugin extends Plugin {
 
 
             if (healing) {
-                if (client.getBoostedSkillLevel(Skill.HITPOINTS) >= config.hpStopHealing()) {
+                if (estado == State.FASE_2) {
+                    if (client.getBoostedSkillLevel(Skill.HITPOINTS) >= client.getRealSkillLevel(Skill.HITPOINTS)) {
+                        healing = false;
+                    }
+                } else if (client.getBoostedSkillLevel(Skill.HITPOINTS) >= config.hpStopHealing()) {
                     healing = false;
                 }
             }
-
 
             if (potTimeout == 0) {
                 if (lowHP(config.hpTriggerHeal()) || healing) {
@@ -562,56 +620,219 @@ public class NexPlugin extends Plugin {
         }
 
 
-
-
         if (estado == State.STARTING) {
             if (client.getVarpValue(172) == 0) {
-                WidgetPackets.queueWidgetActionPacket(1, WidgetInfo.COMBAT_AUTO_RETALIATE.getPackedId(),-1,-1);
+                WidgetPackets.queueWidgetActionPacket(1, WidgetInfo.COMBAT_AUTO_RETALIATE.getPackedId(), -1, -1);
                 log.info("Retaliate puesto en off");
                 return;
             }
+            if (player.getWorldLocation().isInArea(lobbyArea)) {
+                estado = State.BANKING;
+            }
 
-
-
-
-            if(!encendido) return;
-            estado= State.BANKING;
-
-            /*checkMeleeGear();
-            checkPrayer(Prayer.PROTECT_FROM_MAGIC);
-            checkPrayer(Prayer.RIGOUR);*/
+            if (!encendido) return;
+            estado = State.BANKING;
 
         } else if (estado == State.BANKING) {
-            if (Bank.isOpen()) {
+            if (!config.shouldBank()) {
+                estado = State.ENTRAR;
+                return;
+            }
 
+            /*if (!itemChekeados) {
+                itemChekeados = true;
+                equipFaltante = checkEquipment();
+                log.info("eq faltante: {}", equipFaltante);
+
+                suppFaltante = checkInv();
+                if (suppFaltante.size() == 0 && equipFaltante.size() == 0 && itemsNaqVer.size() == 0) {
+                    estado = State.ENTRAR;
+                    return;
+                }
+            }
+
+            if (!Bank.isOpen()) {
+                if (isIdle(player)) {
+                    Optional<NPC> reis = NPCs.search().withId(NpcID.ASHUELOT_REIS_11289).first();
+                    if (reis.isPresent()) {
+                        NPCInteraction.interact(reis.get(), "Bank");
+                    } else {
+                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Bank not found", Color.red), "");
+                    }
+                }
+            }
+
+            //Depositando------------------------
+            if (itemsNaqVer.size() > 0) {
+
+                log.info("woof");
+                int meow=0;
+                for (List<Object> c : suppFaltante) {
+                    if((int)c.get(1) < 0) meow++;
+                }
+                if (itemsNaqVer.size() + meow > 5) {
+                    //deposit all
+                    itemChekeados = false;
+                } else {
+                    if (cc < itemsNaqVer.size()) {
+                        int m = Math.min(1 + N.nextInt(3), itemsNaqVer.size() - cc);
+                        for (int i = cc; i < m + cc; i++) {
+                            BankInventoryInteraction.useItem(itemsNaqVer.get(i), "Deposit-All");
+                        }
+                        cc += m;
+                        if (cc == itemsNaqVer.size()) {
+                            itemChekeados = false;
+                            cc=0;
+                        }
+                        return;
+                    }
+
+                }
+            }
+
+
+            List<Integer> suppliesSobrepasados = suppFaltante.stream().filter(x -> (int) x.get(1) < 0).map(y->(int)y.get(0)).collect(Collectors.toList());
+            if (suppliesSobrepasados.size() > 0) {
+                log.info("meow");
+                if (cc < suppliesSobrepasados.size()) {
+                    int m = Math.min(1 + N.nextInt(3), suppliesSobrepasados.size() - cc);
+                    for (int i = cc; i < m + cc; i++) {
+                        BankInventoryInteraction.useItem(suppliesSobrepasados.get(i), "Deposit-All");
+                    }
+                    cc += m;
+                    if (cc == suppliesSobrepasados.size()) {
+                        itemChekeados = false;
+                        cc=0;
+                    }
+                    return;
+                }
+
+            }
+
+
+            //Sacando--------------------------
+            if (equipFaltante.size() > 0) {
+                log.info("equip Faltante:{}",equipFaltante.size());
+                if (cc < equipFaltante.size()) {
+                    int m = Math.min(1 + N.nextInt(3), equipFaltante.size() - cc);
+                    for (int i = cc; i < m + cc; i++) {
+                        Optional<Widget> widgetDelEquipFaltante = Bank.search().withId(equipFaltante.get(i)).first();
+                        if (widgetDelEquipFaltante.isPresent()) {
+                            log.info("Sacando: {}",widgetDelEquipFaltante.get().getName());
+                            if (widgetDelEquipFaltante.get().getName().contains("arrow") || widgetDelEquipFaltante.get().getName().contains("bolt")) {
+                                BankInteraction.useItem(widgetDelEquipFaltante.get(), "Withdraw-All");
+                            } else {
+                                BankInteraction.useItem(widgetDelEquipFaltante.get(), "Withdraw-1");
+                            }
+
+                        }
+
+                    }
+                    cc += m;
+                    if (cc >= equipFaltante.size()) {
+                        itemChekeados = false;
+                        cc = 0;
+                    }
+                    return;
+                } else {
+                    itemChekeados = false;
+                    cc=0;
+                    return;
+                }
+            }
+
+            if (!invChecked4Gear) {
+                invChecked4Gear = true;
+                gearInInven = BankInventory.search().idInList(meleeGearIDs).result();
+            }
+
+
+            if (gearInInven.size() > 0) {
+                if (cc < gearInInven.size()) {
+                    int m = Math.min(1 + N.nextInt(3), gearInInven.size() - cc);
+                    for (int i = cc; i < cc + m; i++) {
+                        MousePackets.queueClickPacket();
+                        WidgetPackets.queueWidgetActionPacket(9,gearInInven.get(i).getId(),gearInInven.get(i).getItemId(),gearInInven.get(i).getIndex());
+                    }
+                    cc += m;
+                    if (cc == gearInInven.size()) {
+                        invChecked4Gear = false;
+                        cc=0;
+                    }
+                    log.info("Se sacaron {} items",m);
+                    return;
+                }
+            }
+
+
+            if (suppFaltante.size() > 0) {
+                if (cc < suppFaltante.size()) {
+                    Optional<Widget> item = Bank.search().withId((Integer) suppFaltante.get(cc).get(0)).first();
+                    if (item.isPresent()) {
+                        if ((int) suppFaltante.get(cc).get(1) == 1) {
+                            BankInteraction.useItem(item.get(), "Withdraw-1");
+                        } else {
+                            BankInteraction.withdrawX(item.get(), (Integer) suppFaltante.get(cc).get(1));
+                            timeout = 1;
+                        }
+                    } else {
+                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Falta " + suppFaltante.get(cc).get(2), Color.red), "");
+                    }
+                    cc++;
+
+                    if (cc == suppFaltante.size()) {
+                        cc=0;
+                        itemChekeados = false;
+                    }
+                }
+
+            }*/
+
+
+
+
+
+
+            /*if (checkInv().size() == 0 ) {
+                estado = State.ENTRAR;
+                return;
+            }*/
+
+
+
+
+            if (Bank.isOpen()) {
                 if (!mierdaDepositada) {
                     if (itemsBuenos.isEmpty()) {
                         itemsBuenos.addAll(rangedGearIDs);
                         itemsBuenos.addAll(meleeGearIDs);
                         itemsBuenos.addAll(specGearIDs);
+                        itemsBuenos.add(config.meleeWepID());
                         itemsBuenos.addAll(List.of(
                                 ItemID.BOOK_OF_THE_DEAD,
                                 ItemID.RUNE_POUCH,
                                 ItemID.DIVINE_RUNE_POUCH,
                                 ItemID.RUNE_POUCH_L,
                                 ItemID.DIVINE_RUNE_POUCH_L));
+
+
                     }
-                    if (!BankInventory.search().filter(x->!rangedGearIDs.contains(x.getItemId())).empty()) {
+                    if (!BankInventory.search().filter(x -> !itemsBuenos.contains(x.getItemId())).empty()) {
                         if (config.bankAnal()) {
-                            items2bank = BankInventory.search().filter(x->rangedGearIDs.stream().noneMatch(y->x.getItemId()==y)).filterUnique().result();
+                            items2bank = BankInventory.search().filter(x -> rangedGearIDs.stream().noneMatch(y -> x.getItemId() == y)).filterUnique().result();
                             items2bankIterator = items2bank.listIterator();
-                            cc=0;
-                            while (items2bankIterator.hasNext() && cc<6) {
+                            cc = 0;
+                            while (items2bankIterator.hasNext() && cc < 6) {
                                 cc++;
                                 Widget next = items2bankIterator.next();
                                 BankInventoryInteraction.useItem(next, "Deposit-All");
                             }
-                        }else{
-                            items2bank = BankInventory.search().filter(x->rangedGearIDs.stream().noneMatch(y->x.getItemId()==y)).result();
+                        } else {
+                            items2bank = BankInventory.search().filter(x -> rangedGearIDs.stream().noneMatch(y -> x.getItemId() == y)).result();
                             if (items2bank.size() > 0) {
-                                BankInventoryInteraction.useItem(items2bank.get(0),"Deposit-All");
+                                BankInventoryInteraction.useItem(items2bank.get(0), "Deposit-All");
                                 timeout = N.nextInt(2);
-                                log.info("Depositando {}",items2bank.get(0));
+                                log.info("Depositando {}", items2bank.get(0));
 
                             }
                         }
@@ -621,42 +842,8 @@ public class NexPlugin extends Plugin {
                 }
 
 
-                if (potting.size() > 0) {
-
-                    if (nn < potting.size()) {
-                        if (potting.get(nn).isPresent()) {
-                            WidgetPackets.queueWidgetActionPacket(9, potting.get(nn).get().getId(), potting.get(nn).get().getItemId(), potting.get(nn).get().getIndex());
-                            log.info("Usando {}", potting.get(nn).get().getName());
-                            nn++;
-                            timeout = 2;
-                            return;
-                        } else {
-                            log.info("No se encontro una wea");
-                        }
-                    }
-                    if (!Inventory.full()) {
-                        Optional<Widget> saras = Bank.search().withId(ItemID.SARADOMIN_BREW4).first();
-                        if (saras.isPresent()) {
-                            BankInteraction.useItem(saras.get(), "Withdraw-All");
-                        } else {
-                            client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Brews not found", Color.red), "");
-                            estado = State.APAGADO;
-                        }
-                        return;
-                    }
-
-
-                    estado = State.ENTRAR;
-                    mierdaDepositada = false;
-                    potting = new ArrayList<>();
-                    prePot = new ArrayList<>();
-                    supp = new ArrayList<>();
-
-                    client.runScript(29);
-                    client.runScript(138);
-
-                } else if (prePot.size() > 0 || supp.size() > 0) {
-                    if (cc < supp.size() - 1) {
+                if (prePot.size() > 0 || supp.size() > 0) {
+                    if (cc < supp.size() - 1) { //sacando los suplies
                         if (((Optional<?>) supp.get(cc).get(0)).isPresent()) {
                             Widget item = (Widget) ((Optional<?>) supp.get(cc).get(0)).get();
                             int amount = (Integer) supp.get(cc).get(1);
@@ -667,7 +854,7 @@ public class NexPlugin extends Plugin {
                                 cc++;
                             } else if (amount - listas < 0) {
                                 BankInventoryInteraction.useItem(item, "Deposit-All");
-                                log.info("ya hay {}",item.getName());
+                                log.info("ya hay {}", item.getName());
                             }
                             timeout = 1;
                             return;
@@ -675,66 +862,82 @@ public class NexPlugin extends Plugin {
                             log.info("No " + supp.get(cc).get(2));
                         }
                     }
+                    client.runScript(138);
 
-                    if (nn < prePot.size()) {
-                        if (((Optional<?>) prePot.get(nn).get(0)).isPresent()) {
-                            BankInteraction.withdrawX((Widget) ((Optional<?>) prePot.get(nn).get(0)).get(), (Integer) prePot.get(nn).get(1));
-                            log.info("sacando {}", prePot.get(nn).get(2));
-                            nn++;
-                            timeout = 2;
-                            return;
-                        } else {
-                            log.info("No " + prePot.get(nn).get(2));
+                    if (config.shouldPrepot()) {
+                        if (nn < prePot.size()) {   //withdrawing Pre-pot
+                            if (((Optional<?>) prePot.get(nn).get(0)).isPresent()) {
+                                //BankInteraction.withdrawX((Widget) ((Optional<?>) prePot.get(nn).get(0)).get(), (Integer) prePot.get(nn).get(1));
+                                BankInteraction.useItem((Widget) ((Optional<?>) prePot.get(nn).get(0)).get(), "Withdraw-1");
+                                log.info("sacando {}", prePot.get(nn).get(2));
+                                nn++;
+                                timeout = 2;
+                                return;
+                            } else {
+                                log.info("No " + prePot.get(nn).get(2));
+                            }
+                        }
+
+
+                        log.info("Cargando las dosis");
+                        if (config.heart()) {
+                            potting.add(BankInventory.search().withId(ItemID.SATURATED_HEART).first());
+                            log.info("cargando el corazon");
+                        }
+                        if (config.antiPre()) {
+                            potting.add(BankInventory.search().withId(ItemID.ANTIDOTE1_5958).first());
+                        }
+                        if (config.combatPre()) {
+                            potting.add(BankInventory.search().withId(ItemID.SUPER_COMBAT_POTION1).first());
+                        }
+                        if (config.rangPre()) {
+                            potting.add(BankInventory.search().withId(ItemID.RANGING_POTION1).first());
+                        }
+                        if (config.menaphitePre()) {
+                            potting.add(BankInventory.search().withId(ItemID.MENAPHITE_REMEDY1).first());
+                        }
+                        if (config.anglerPre()) {
+                            potting.add(BankInventory.search().withId(ItemID.ANGLERFISH).first());
                         }
                     }
-                    cc = 0;
-                    nn = 0;
 
-                    log.info("Cargando las dosis");
-                    if (config.heart()) {
-                        potting.add(BankInventory.search().withId(ItemID.SATURATED_HEART).first());
-                        log.info("cargando el corazon");
-                    }
-                    if (config.antiPre()) {
-                        potting.add(BankInventory.search().withId(ItemID.ANTIDOTE1_5958).first());
-                    }
-                    if (config.combatPre()) {
-                        potting.add(BankInventory.search().withId(ItemID.SUPER_COMBAT_POTION1).first());
-                    }
-                    if (config.rangPre()) {
-                        potting.add(BankInventory.search().withId(ItemID.RANGING_POTION1).first());
-                    }
-                    if (config.menaphitePre()) {
-                        potting.add(BankInventory.search().withId(ItemID.MENAPHITE_REMEDY1).first());
-                    }
-                    if (config.anglerPre()) {
-                        potting.add(BankInventory.search().withId(ItemID.ANGLERFISH).first());
-                    }
+                    nn = 0;
+                    cc = 0;
+                    client.runScript(138);
+                    mierdaDepositada = false;
+                    estado = State.ENTRAR;
 
                 } else { //cargando los supplies necesarios
                     supp.add(List.of(Bank.search().withId(ItemID.SUPER_RESTORE4).first(), config.restoreAmount(), "Super restore(4)"));
                     supp.add(List.of(Bank.search().withId(ItemID.SUPER_COMBAT_POTION4).first(), config.combatAmount(), "Super Combat(4)"));
                     supp.add(List.of(Bank.search().withId(ItemID.RANGING_POTION4).first(), config.rangAmount(), "Ranging potion(4)"));
                     supp.add(List.of(Bank.search().withId(ItemID.SARADOMIN_BREW4).first(), config.saraAmount(), "Saradomin brew(4)"));
+                    if (config.thralls()) {
+                        supp.add(List.of(Bank.search().withId(ItemID.BOOK_OF_THE_DEAD).first(), 1,"Book of the death"));
+                        supp.add(List.of(Bank.search().withId(ItemID.DIVINE_RUNE_POUCH).first(), config.saraAmount(), "Saradomin brew(4)"));
+                    }
 
-                    if (config.heart()) {
-                        prePot.add(List.of(Bank.search().withId(ItemID.SATURATED_HEART).first(), 1, "Heart"));
+                    if (config.shouldPrepot()) {
+                        if (config.heart()) {
+                            prePot.add(List.of(Bank.search().withId(ItemID.SATURATED_HEART).first(), 1, "Heart"));
+                        }
+                        if (config.antiPre()) {
+                            prePot.add(List.of(Bank.search().withId(ItemID.ANTIDOTE1_5958).first(), 1, "Antidote 1"));
+                        }
+                        if (config.combatPre()) {
+                            prePot.add(List.of(Bank.search().withId(ItemID.SUPER_COMBAT_POTION1).first(), 1, "Combat 1"));
+                        }
+                        if (config.rangPre()) {
+                            prePot.add(List.of(Bank.search().withId(ItemID.RANGING_POTION1).first(), 1, "Ranging 1"));
+                        }
+                        if (config.menaphitePre()) {
+                            prePot.add(List.of(Bank.search().withId(ItemID.MENAPHITE_REMEDY1).first(), 1, "Menaphite remedy 1"));
+                        }
+                        if (config.anglerPre()) {
+                            prePot.add(List.of(Bank.search().withId(ItemID.ANGLERFISH).first(), 1, "Anglerfish"));
+                        }
                     }
-                    if (config.antiPre()) {
-                        prePot.add(List.of(Bank.search().withId(ItemID.ANTIDOTE1_5958).first(), 1, "Antidote 1"));
-                    }
-                    if (config.combatPre()) {
-                        prePot.add(List.of(Bank.search().withId(ItemID.SUPER_COMBAT_POTION1).first(), 1, "Combat 1"));
-                    }
-                    if (config.rangPre()) {
-                        prePot.add(List.of(Bank.search().withId(ItemID.RANGING_POTION1).first(), 1, "Ranging 1"));
-                    }
-                    if (config.menaphitePre()) {
-                        prePot.add(List.of(Bank.search().withId(ItemID.MENAPHITE_REMEDY1).first(), 1, "Menaphite remedy 1"));
-                    }
-                    if (config.anglerPre()) {
-                        prePot.add(List.of(Bank.search().withId(ItemID.ANGLERFISH).first(), 1, "Anglerfish"));
-                    }
+
                 }
 
             } else {
@@ -743,14 +946,9 @@ public class NexPlugin extends Plugin {
                     if (reis.isPresent()) {
                         NPCInteraction.interact(reis.get(), "Bank");
                     } else {
-                        client.addChatMessage(ChatMessageType.GAMEMESSAGE,"",ColorUtil.wrapWithColorTag("Bank not found",Color.red),"");
+                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Bank not found", Color.red), "");
                     }
                 }
-
-                Equipment.search().filter(x->meleeGearIDs.stream().noneMatch(y->x.getItemId()==y)).first();
-
-
-
             }
 
 
@@ -764,18 +962,10 @@ public class NexPlugin extends Plugin {
                 if (config.waitForMaster()) {
                     Optional<Player> master = Players.search().filter(x -> Text.removeTags(x.getName()).equalsIgnoreCase(config.masterName())).first();
                     if (master.isPresent() && master.get().getWorldLocation().isInArea(areaMasterPortal)) {
-                        Optional<TileObject> portal = TileObjects.search().withId(PORTAL_OPEN).first();
-                        if (portal.isPresent()) {
-                            TileObjectInteraction.interact(portal.get(), "Pass (normal)");
-                            timeout = 5;
-                        }
+                        entranding = true;
                     }
                 } else {
-                    Optional<TileObject> portal = TileObjects.search().withId(PORTAL_OPEN).first();
-                    if (portal.isPresent()) {
-                        TileObjectInteraction.interact(portal.get(), "Pass (normal)");
-                        timeout = 5;
-                    }
+                    entranding = true;
                 }
             } else {
                 if (isIdle(player)) {
@@ -787,7 +977,75 @@ public class NexPlugin extends Plugin {
                 }
             }
 
+            if (entranding) {
+                if (config.shouldPrepot() && potting.size() > 0) {
+                    if (Bank.isOpen()) {   //bank must be open for prepot
 
+                        if (nn < potting.size()) {  //drinking prepots
+                            if (potting.get(nn).isPresent()) {
+                                WidgetPackets.queueWidgetActionPacket(9, potting.get(nn).get().getId(), potting.get(nn).get().getItemId(), potting.get(nn).get().getIndex());
+                                log.info("Usando {}", potting.get(nn).get().getName());
+                                nn++;
+                                if (nn == potting.size()) {
+                                    timeout = N.nextInt(2);
+                                } else {
+                                    timeout = 2;
+                                }
+                                return;
+                            } else {
+                                log.info("No se encontro una wea");
+                            }
+                        }
+                        Optional<Widget> corazon = BankInventory.search().idInList(List.of(ItemID.SATURATED_HEART, ItemID.IMBUED_HEART)).first();
+                        if (corazon.isPresent()) {
+                            BankInventoryInteraction.useItem(corazon.get(), "Deposit-All");
+                            return;
+                        }
+
+                        if (!Inventory.full()) {
+                            Optional<Widget> saras = Bank.search().withId(ItemID.SARADOMIN_BREW4).first();
+                            if (saras.isPresent()) {
+                                BankInteraction.useItem(saras.get(), "Withdraw-All");
+                            } else {
+                                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Brews not found", Color.red), "");
+                                estado = State.APAGADO;
+                            }
+                            return;
+                        }
+
+                        if (config.wep2h()) {
+                            Optional<Widget> sara = BankInventory.search().withId(ItemID.SARADOMIN_BREW4).first();
+                            sara.ifPresent(x -> BankInventoryInteraction.useItem(x, "Deposit-1"));
+                        }
+
+                        potting = new ArrayList<>();
+                        prePot = new ArrayList<>();
+                        supp = new ArrayList<>();
+
+                        client.runScript(29);
+                        //client.runScript(138);
+
+                    } else {
+                        if (isIdle(player)) {
+                            Optional<NPC> reis = NPCs.search().withId(NpcID.ASHUELOT_REIS_11289).first();
+                            if (reis.isPresent()) {
+                                NPCInteraction.interact(reis.get(), "Bank");
+                                timeout = 1;
+                            } else {
+                                client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Bank not found", Color.red), "");
+                            }
+                        }
+                    }
+                } else {
+                    Optional<TileObject> portal = TileObjects.search().withId(PORTAL_OPEN).first();
+                    if (portal.isPresent()) {
+                        TileObjectInteraction.interact(portal.get(), "Pass (normal)");
+                        timeout = 5;
+                    }
+                }
+
+
+            }
 
 
         } else if (estado == State.FASE_1) {//-------------------------------------------------------------------------
@@ -816,10 +1074,10 @@ public class NexPlugin extends Plugin {
             }
 
             //Atacke y esquive---------------------------------
-            if (thereIs > 0 && thereIs < 4) {
-                thereIs++;
+
+            if (thereIs == 6) {
+                moverHacia(client, config.playerKey().getP1Tile());
             } else if (thereIs == 4) {
-                thereIs = 0;
                 int angulo = nex.getCurrentOrientation();
                 Angle ang = new Angle(nex.getCurrentOrientation());
                 log.info("angulo:{}", ang);
@@ -849,10 +1107,12 @@ public class NexPlugin extends Plugin {
                         moverHacia(client, new WorldPoint(2914, 5205, 0));
                     }
                 }
-                timeout = 5;
-            } else if (player.getInteracting() == null) {
+            }else if (player.getInteracting() == null) {
                 NPCInteraction.interact(nex, "Attack");
                 log.info("atackando a nex");
+            }
+            if (thereIs > 0) {
+                thereIs++;
             }
 
             if (!healing
@@ -918,14 +1178,30 @@ public class NexPlugin extends Plugin {
 
             //Atacke y esquive---------------------------------------------------------
             if (nex.getPoseAnimation() == 9175 || walkUnder) {
+                if (nex.getInteracting() != null && nex.getInteracting().getName() != null && !nex.getInteracting().getName().equalsIgnoreCase(player.getName())) {
+                    if (nex.getInteracting().getWorldLocation().distanceTo(nexLoc) > 4) {
+                        runBitch++;
+                        log.info("runBitch: {}", runBitch);
+                        if (runBitch >= 2) {
+                            walkUnder = false;
+                            runBitch = 0;
+                            return;
+                        }
+                    }
+                }
+
                 if (nexLoc.distanceTo(player.getWorldLocation()) <= 4) {
+                    if (darkness > 0) {
+                        healing = true;
+                    }
                     walkUnder = true;
                     MousePackets.queueClickPacket();
                     MovementPackets.queueMovement(nexLoc);
-                    log.info("moviendo debajo de nex");
+                    log.info("moviendo debajo de nex con healing: {}",healing);
                     return;
                 } else {
                     if (walkUnder) {
+                        runBitch = 0;
                         walkUnder = false;
                         return;
                     }
@@ -938,48 +1214,50 @@ public class NexPlugin extends Plugin {
                 if (weaNegra.stream().anyMatch(x -> x.getWorldLocation().equals(player.getWorldLocation())) && isIdle(player)) {
                     log.info("debajo mio");
                     WorldPoint wpGamer = player.getWorldLocation();
+                    if (client.getCollisionMaps() == null) {
+                        return;
+                    }
+                    CollisionData col = client.getCollisionMaps()[client.getPlane()];
                     MousePackets.queueClickPacket();
-                    if (isWalkable(client.getCollisionMaps()[client.getPlane()], wpGamer.dx(1).dy(0))) {
+                    if (isWalkable(col, wpGamer.dx(1).dy(0)) && weaNegra.stream().noneMatch(x -> x.getWorldLocation().equals(wpGamer.dx(1).dy(0)))) {
                         MovementPackets.queueMovement(wpGamer.dx(1).dy(0));
-                    } else if (isWalkable(client.getCollisionMaps()[client.getPlane()], wpGamer.dx(0).dy(1))) {
+                    } else if (isWalkable(col, wpGamer.dx(0).dy(1)) && weaNegra.stream().noneMatch(x -> x.getWorldLocation().equals(wpGamer.dx(0).dy(1)))) {
                         MovementPackets.queueMovement(wpGamer.dx(0).dy(1));
-                    } else if (isWalkable(client.getCollisionMaps()[client.getPlane()], wpGamer.dx(-1).dy(0))) {
+                    } else if (isWalkable(col, wpGamer.dx(-1).dy(0)) && weaNegra.stream().noneMatch(x -> x.getWorldLocation().equals(wpGamer.dx(-1).dy(0)))) {
                         MovementPackets.queueMovement(wpGamer.dx(-1).dy(0));
-                    } else if (isWalkable(client.getCollisionMaps()[client.getPlane()], wpGamer.dx(0).dy(-1))) {
+                    } else if (isWalkable(col, wpGamer.dx(0).dy(-1)) && weaNegra.stream().noneMatch(x -> x.getWorldLocation().equals(wpGamer.dx(0).dy(-1)))) {
                         MovementPackets.queueMovement(wpGamer.dx(0).dy(-1));
                     }
                 }
-            } else if (!specing && player.getWorldLocation().distanceTo(nexLoc) < config.rangeDistant().getDistant() && isIdle(player)
-                    || darkness > 0 && player.getWorldLocation().distanceTo(nexLoc) < config.rangeDistant().getDistant()) {
-                escapeTile = null;
-                if (isIdle(nex)) {
-                    escapeTile = metodo3(config.rangeDistant().getDistant());
-                    if (escapeTile != null) {
-                        MousePackets.queueClickPacket();
-                        MovementPackets.queueMovement(escapeTile);
-                        log.info("moviendo al escapeTile {}", WorldPoint.fromLocalInstance(client, LocalPoint.fromWorld(client, escapeTile)));
-                        timeout = 1;
-                    } else {
-                        log.info("no se encontro un puto tile");
-                    }
-                }
-            } else if (isIdle(player)) {
+            } else if (isIdle(nex)) {
                 LocalPoint nexTrueLocal = LocalPoint.fromWorld(client, nex.getWorldLocation());
-                if (nexTrueLocal == null) {
-                    return;
-                }
+                if (nexTrueLocal == null) return;
                 WorldPoint nexFromLocal = WorldPoint.fromLocalInstance(client, nexTrueLocal);
                 WorldPoint centerPoint = new ArrayList<>(WorldPoint.toLocalInstance(client, CENTER_TILE)).get(0);
                 WorldPoint tilePreferido = new WorldPoint(centerPoint.getX(), nexLoc.getY() + 1 + config.rangeDistant().getDistant(), 0);
 
-                if (isIdle(nex) && nexFromLocal.isInArea(areaNexP2) && !player.getWorldLocation().equals(tilePreferido)) {
-                    MousePackets.queueClickPacket();
-                    MovementPackets.queueMovement(tilePreferido);
+                if (nexFromLocal.isInArea(areaNexP2) && !player.getWorldLocation().equals(tilePreferido)) {
+                    if (isIdle(player)) {
+                        MousePackets.queueClickPacket();
+                        MovementPackets.queueMovement(tilePreferido);
+                    }
+                } else if (player.getWorldLocation().distanceTo(nexLoc) < config.rangeDistant().getDistant()) {
+                    if (isIdle(player)) {
+                        escapeTile = null;
+                        escapeTile = metodo3(config.rangeDistant().getDistant());
+                        if (escapeTile != null) {
+                            MousePackets.queueClickPacket();
+                            MovementPackets.queueMovement(escapeTile);
+                            log.info("moviendo al escapeTile {}", WorldPoint.fromLocalInstance(client, LocalPoint.fromWorld(client, escapeTile)));
+                            timeout = 1;
+                        } else {
+                            log.info("no se encontro un puto tile");
+                        }
+                    }
                 } else if (!player.isInteracting()) {
                     log.info("Atackando a la perra");
                     NPCInteraction.interact(nex, "Attack");
                 }
-
             }
 
             if (!healing
@@ -987,6 +1265,9 @@ public class NexPlugin extends Plugin {
                     && client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT) >= config.specPercent() * 10
                     && client.getBoostedSkillLevel(config.specStyle().getSkill()) >= client.getRealSkillLevel(config.specStyle().getSkill())) {
                 specing = true;
+            }
+            if (client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT) < config.specPercent() * 10) {
+                specing = false;
             }
 
         } else if (estado == State.UMBRA) {
@@ -1000,8 +1281,20 @@ public class NexPlugin extends Plugin {
             CollisionData col = client.getCollisionMaps()[client.getPlane()];
 
 
-            if (nex.getPoseAnimation() == 9175 || walkUnder) {
+
+
+             if (umbra == null || umbra.isDead()) {
+                Optional<NPC> npc = NPCs.search().withId(UMBRA_ID).first();
+                if (npc.isPresent()) {
+                    umbra = npc.get();
+                } else {
+                    estado = State.FASE_3;
+                }
+            } else if (nex.getPoseAnimation() == 9175 || walkUnder) {
                 if (nexWp.distanceTo(player.getWorldLocation()) <= 4) {
+                    if (darkness > 0) {
+                        healing = true;
+                    }
                     walkUnder = true;
                     MousePackets.queueClickPacket();
                     MovementPackets.queueMovement(nexWp);
@@ -1013,31 +1306,22 @@ public class NexPlugin extends Plugin {
                         return;
                     }
                 }
-            }
-
-            if (weaNegra.size() > 0) {
-                log.info("wea negra!");
-                if (weaNegra.stream().anyMatch(x -> x.getWorldLocation().equals(player.getWorldLocation())) && isIdle(player)) {
-                    log.info("debajo mio");
-                    WorldPoint wpGamer = player.getWorldLocation();
-                    MousePackets.queueClickPacket();
-                    if (isWalkable(col, wpGamer.dx(1).dy(0))) {
-                        MovementPackets.queueMovement(wpGamer.dx(1).dy(0));
-                    } else if (isWalkable(col, wpGamer.dx(0).dy(1))) {
-                        MovementPackets.queueMovement(wpGamer.dx(0).dy(1));
-                    } else if (isWalkable(col, wpGamer.dx(-1).dy(0))) {
-                        MovementPackets.queueMovement(wpGamer.dx(-1).dy(0));
-                    } else if (isWalkable(col, wpGamer.dx(0).dy(-1))) {
-                        MovementPackets.queueMovement(wpGamer.dx(0).dy(-1));
+            }else if (weaNegra.size() > 0) {
+                    log.info("wea negra!");
+                    if (weaNegra.stream().anyMatch(x -> x.getWorldLocation().equals(player.getWorldLocation())) && isIdle(player)) {
+                     log.info("debajo mio");
+                     WorldPoint wpGamer = player.getWorldLocation();
+                     MousePackets.queueClickPacket();
+                     if (isWalkable(col, wpGamer.dx(1).dy(0)) && weaNegra.stream().noneMatch(x -> x.getWorldLocation().equals(wpGamer.dx(1).dy(0)))) {
+                         MovementPackets.queueMovement(wpGamer.dx(1).dy(0));
+                     } else if (isWalkable(col, wpGamer.dx(0).dy(1)) && weaNegra.stream().noneMatch(x -> x.getWorldLocation().equals(wpGamer.dx(0).dy(1)))) {
+                         MovementPackets.queueMovement(wpGamer.dx(0).dy(1));
+                     } else if (isWalkable(col, wpGamer.dx(-1).dy(0)) && weaNegra.stream().noneMatch(x -> x.getWorldLocation().equals(wpGamer.dx(-1).dy(0)))) {
+                         MovementPackets.queueMovement(wpGamer.dx(-1).dy(0));
+                     } else if (isWalkable(col, wpGamer.dx(0).dy(-1)) && weaNegra.stream().noneMatch(x -> x.getWorldLocation().equals(wpGamer.dx(0).dy(-1)))) {
+                         MovementPackets.queueMovement(wpGamer.dx(0).dy(-1));
+                     }
                     }
-                }
-            } else if (umbra == null || umbra.isDead()) {
-                Optional<NPC> npc = NPCs.search().withId(UMBRA_ID).first();
-                if (npc.isPresent()) {
-                    umbra = npc.get();
-                } else {
-                    estado = State.FASE_3;
-                }
             } else if (isIdle(player)) {
                 if (player.getWorldLocation().distanceTo(nexWp) >= 6) {
                     Actor enemy = player.getInteracting();
@@ -1045,7 +1329,6 @@ public class NexPlugin extends Plugin {
                         log.info("atakando a umbra");
                         NPCInteraction.interact(umbra, "Attack");
                     }
-
                 } else {
                     LocalPoint nexLp = LocalPoint.fromWorld(client, nexWp);
                     if (nexLp == null) {
@@ -1087,24 +1370,12 @@ public class NexPlugin extends Plugin {
 
 
             //Atacke y esquive---------------------------------
-
-            //Code para no apilar players
-            /*
-            List<WorldPoint> tilePlayers = client.getPlayers().stream().map(Actor::getWorldLocation).collect(Collectors.toList());
-            WorldPoint nexC = nex.getWorldLocation().dx(1).dy(1);
-            PajauApiPlugin.TilesAvalibleRadial(client,2,nexC, tile -> {
-                WorldArea areaTile = new WorldArea(tile.dx(-1).dy(-1),3,3);
-                boolean tileContaminado = tilePlayers.stream().anyMatch(areaTile::contains);
-                return !tile.equals(nexC.dx(-2).dy(-2)) && !tile.equals(nexC.dx(2).dy(-2)) && !tile.equals(nexC.dx(2).dy(2)) && !tile.equals(nexC.dx(-2).dy(2)) && !tileContaminado;
-            });
-            */
-
-
             WorldPoint destinationTile = null;
             if (client.getLocalDestinationLocation() != null) {
                 destinationTile = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
             }
-
+            List<Player> players = client.getPlayers();
+            players.removeIf(x -> x.getName() != null && x.getName().equalsIgnoreCase(client.getLocalPlayer().getName()));
 
             if (bloodSacrifice > 0) {
                 if (player.getWorldLocation().distanceTo(nex.getWorldArea()) <= 6) {
@@ -1125,12 +1396,42 @@ public class NexPlugin extends Plugin {
                 if (!fightingReaver) {
                     NPCInteraction.interact(bloodReaver, "Attack");
                 }
-            } else if (player.getInteracting() == null || player.getInteracting().getName() == null || !player.getInteracting().getName().equals(nex.getName())) {
+            } else if (isIdle(player) && (player.getInteracting() == null || player.getInteracting().getName() == null || !player.getInteracting().getName().equals(nex.getName()))) {
                 NPCInteraction.interact(nex, "Attack");
+            } else if (isIdle(player) && player.getWorldArea().isInMeleeDistance(nex.getWorldArea()) && isIdle(nex) && players.stream().anyMatch(x -> x.getWorldLocation().distanceTo(player.getWorldLocation()) <= 1)) {
+                players.forEach(x -> {
+                    if (x.getWorldLocation().distanceTo(player.getWorldLocation()) <= 1) {
+                        log.info("nombre: {}", x.getName());
+                    }
+                });
+                log.info("aloneTimer: {}", aloneTimer);
+                if (aloneTimer == 0) {
+                    aloneTimer = 2 + N.nextInt(9);
+                } else {
+                    aloneTimer--;
+                    if (aloneTimer == 1) {
+                        aloneTimer = 0;
+                        List<WorldPoint> tilePlayers = players.stream().map(Actor::getWorldLocation).collect(Collectors.toList());
+                        WorldPoint nexC = nex.getWorldLocation().dx(1).dy(1);
+                        WorldPoint tileAlone = PajauApiPlugin.TilesAvalibleRadial(client, 2, nexC, tile -> {
+                            WorldArea areaTile = new WorldArea(tile.dx(-1).dy(-1), 3, 3);
+                            boolean tileContaminado = tilePlayers.stream().anyMatch(areaTile::contains);
+                            return !tile.equals(nexC.dx(-2).dy(-2)) && !tile.equals(nexC.dx(2).dy(-2)) && !tile.equals(nexC.dx(2).dy(2)) && !tile.equals(nexC.dx(-2).dy(2)) && !tileContaminado;
+                        });
+                        if (tileAlone != null) {
+                            MousePackets.queueClickPacket();
+                            MovementPackets.queueMovement(tileAlone);
+                        }
+                    }
+                }
+
+
             } else if (!healing
+                    && player.getInteracting() != null && player.getInteracting().getName() != null
                     && player.getInteracting().getName().equals(nex.getName())
                     && client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT) >= config.specPercent() * 10
                     && client.getBoostedSkillLevel(config.specStyle().getSkill()) >= client.getRealSkillLevel(config.specStyle().getSkill())) {
+
                 specing = true;
             }
 
@@ -1143,6 +1444,12 @@ public class NexPlugin extends Plugin {
             checkRangedGear();
 
             WorldPoint nexLoc = nex.getWorldLocation();
+            WorldPoint destTile = null;
+            if (client.getLocalDestinationLocation() != null) {
+                destTile = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
+            }
+
+
             if (cruor == null || cruor.isDead()) {
                 Optional<NPC> npc = NPCs.search().withId(NpcID.CRUOR).first();
                 if (npc.isPresent()) {
@@ -1150,26 +1457,37 @@ public class NexPlugin extends Plugin {
                 } else {
                     estado = State.FASE_4;
                 }
-            } else if (isIdle(player)) {
-                if (bloodSacrifice > 0 && player.getWorldLocation().distanceTo(nexLoc) <= 6) {
-                    escapeTile = metodo3(7);
-                    if (escapeTile != null) {
-                        MousePackets.queueClickPacket();
-                        MovementPackets.queueMovement(escapeTile);
+            } else if (bloodSacrifice > 0) {
+                if (player.getWorldLocation().distanceTo(nexLoc) <= 6 || (destTile != null && destTile.distanceTo(nexLoc) <= 6)) {
+                    if (destTile == null || destTile.distanceTo(nexLoc) <= 6) {
+                        escapeTile = metodo3(7);
+                        if (escapeTile != null) {
+                            MousePackets.queueClickPacket();
+                            MovementPackets.queueMovement(escapeTile);
+                            log.info("meow");
+                        }
                     }
-                } else {
-                    if (player.getInteracting() == null || player.getInteracting().getName() == null || !player.getInteracting().getName().equals(nex.getName())) {
-                        NPCInteraction.interact(cruor, "Attack");
-                    }
+                } else if (player.getInteracting() == null || player.getInteracting().getName() == null || !player.getInteracting().getName().equals(cruor.getName())) {
+                    NPCInteraction.interact(cruor, "Attack");
                 }
+            } else if (player.getInteracting() == null || player.getInteracting().getName() == null || !player.getInteracting().getName().equals(cruor.getName())) {
+                NPCInteraction.interact(cruor, "Attack");
             }
         } else if (estado == State.FASE_4) {
             //Special---------------------------------------------------------------
-
-
+            if (client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT) < config.specPercent() * 10) {
+                specing = false;
+            }
             //Prayer y Gear---------------------------------------------------------
-            checkPrayer(Prayer.PROTECT_FROM_MAGIC);
-            if (containThis > 0) {
+            if (estalagmitas.size() > 0 && stalagmiteCount <= 2) {
+                checkPrayer(Prayer.PROTECT_FROM_MISSILES);
+            } else {
+                checkPrayer(Prayer.PROTECT_FROM_MAGIC);
+            }
+
+            if (estalagmitas.size() > 0) {
+                checkGear("wepMelee");
+            } else if (containThis > 0) {
                 containThis--;
                 if (specing && config.specStyle().getSkill() == Skill.RANGED) {
                     checkGear("spec");
@@ -1189,17 +1507,36 @@ public class NexPlugin extends Plugin {
                 checkBoost(Skill.STRENGTH);
             }
 
-            //Atacke y esquive---------------------------------------------------------
+            //atacking and dodging---------------------------------------------------------
+            List<Player> players = client.getPlayers();
+            players.removeIf(x -> x.getName() != null && x.getName().equalsIgnoreCase(client.getLocalPlayer().getName()));
 
             if (isIdle(player)) {
                 if (estalagmitas.size() > 0) {
-                    log.info("Stalagmitas");
-                    Optional<GameObject> estalagmitaCercana = estalagmitas.stream().min(Comparator.comparingInt(x -> x.getWorldLocation().distanceTo(player.getWorldLocation())));
-                    if (estalagmitaCercana.isPresent()) {
-                        log.info("Liberando de estalagmitas");
-                        TileObjectInteraction.interact(estalagmitaCercana.get(), "Attack");
+                    stalagmiteCount--;
+                    WorldArea playerArea = new WorldArea(player.getWorldLocation().dx(-1).dy(-1), 3, 3);
+
+                    if (stalagmiteCount == 4) {
+                        healing = true;
+                    }
+
+                    if (estalagmitas.stream().allMatch(x -> x.getWorldLocation().isInArea(playerArea))) {
+                        players.removeIf(x -> x.getWorldLocation().isInArea(player.getWorldArea()));
+                        Optional<Player> nearestPlayer = players.stream().min(Comparator.comparingInt(x -> x.getWorldLocation().distanceTo(playerArea)));
+                        if (nearestPlayer.isPresent()) {
+                            if (nearestPlayer.get().getWorldLocation().distanceTo(playerArea) >= 4) {
+                                healing = true;
+                            }
+                        }
                     } else {
-                        log.info("no se encontro estalagmita cercana");
+                        log.info("Stalagmitas");
+                        Optional<GameObject> estalagmitaCercana = estalagmitas.stream().min(Comparator.comparingInt(x -> x.getWorldLocation().distanceTo(player.getWorldLocation())));
+                        if (estalagmitaCercana.isPresent()) {
+                            log.info("Liberando de estalagmitas");
+                            TileObjectInteraction.interact(estalagmitaCercana.get(), "Attack");
+                        } else {
+                            log.info("no se encontro estalagmita cercana");
+                        }
                     }
                 } else if (containThis > 0) {
                     log.info("Contain this");
@@ -1230,6 +1567,26 @@ public class NexPlugin extends Plugin {
                     }
                     NPCInteraction.interact(nex, "Attack");
                     log.info("Atackando a la maraka");
+                } else if (player.getWorldArea().isInMeleeDistance(nex.getWorldArea()) && isIdle(nex) && players.stream().anyMatch(x -> x.getWorldLocation().distanceTo(player.getWorldLocation()) <= 1)) {
+                    if (aloneTimer == 0) {
+                        aloneTimer = 2 + N.nextInt(9);
+                    } else {
+                        aloneTimer--;
+                        if (aloneTimer == 1) {
+                            aloneTimer = 0;
+                            List<WorldPoint> tilePlayers = players.stream().map(Actor::getWorldLocation).collect(Collectors.toList());
+                            WorldPoint nexC = nex.getWorldLocation().dx(1).dy(1);
+                            WorldPoint tileAlone = PajauApiPlugin.TilesAvalibleRadial(client, 2, nexC, tile -> {
+                                WorldArea areaTile = new WorldArea(tile.dx(-1).dy(-1), 3, 3);
+                                boolean tileContaminado = tilePlayers.stream().anyMatch(areaTile::contains);
+                                return !tile.equals(nexC.dx(-2).dy(-2)) && !tile.equals(nexC.dx(2).dy(-2)) && !tile.equals(nexC.dx(2).dy(2)) && !tile.equals(nexC.dx(-2).dy(2)) && !tileContaminado;
+                            });
+                            if (tileAlone != null) {
+                                MousePackets.queueClickPacket();
+                                MovementPackets.queueMovement(tileAlone);
+                            }
+                        }
+                    }
                 }
 
                 if (!healing
@@ -1238,11 +1595,28 @@ public class NexPlugin extends Plugin {
                     specing = true;
                 }
 
+            } else {
+                if (containThis > 0) {
+                    if (client.getLocalDestinationLocation() != null) {
+                        WorldPoint destTile = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
+                        WorldArea areaContain = new WorldArea(nex.getWorldLocation().dx(-1).dy(-1), 5, 5);
+                        if (destTile.isInArea(areaContain)) {
+                            WorldPoint tileContainEscape = null;
+                            for (int i = 1; i < 6; i++) {
+                                tileContainEscape = PajauApiPlugin.TilesAvalibleRadial(client, i, player.getWorldLocation(), x -> !x.isInArea(areaContain));
+                                if (tileContainEscape != null) {
+                                    MousePackets.queueClickPacket();
+                                    MovementPackets.queueMovement(tileContainEscape);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
 
         } else if (estado == State.GLACIES) {
-            checkPrayer(Prayer.PROTECT_FROM_MAGIC);
             checkPrayer(Prayer.RIGOUR);
             checkBoost(Skill.RANGED);
 
@@ -1250,8 +1624,12 @@ public class NexPlugin extends Plugin {
                 containThis--;
             }
             if (estalagmitas.size() > 0) {
-                checkMeleeGear();
+                if (stalagmiteCount <= 2) {
+                    checkPrayer(Prayer.PROTECT_FROM_MISSILES);
+                }
+                checkGear("wepMelee");
             } else {
+                checkPrayer(Prayer.PROTECT_FROM_MAGIC);
                 checkRangedGear();
             }
 
@@ -1262,19 +1640,37 @@ public class NexPlugin extends Plugin {
                 } else {
                     estado = State.FASE_5;
                 }
-            } else if (isIdle(player)) {
-                //42943 42944
-                if (estalagmitas.size() > 0) {
-                    Optional<GameObject> estalagmitaCercana = estalagmitas.stream().min(Comparator.comparingInt(x -> x.getWorldLocation().distanceTo(player.getWorldLocation())));
-                    if (estalagmitaCercana.isPresent()) {
-                        log.info("Liberando de estalagmitas");
-                        TileObjectInteraction.interact(estalagmitaCercana.get(), "Attack");
-                    } else {
-                        log.info("no se encontro estalagmita cercana");
+            } else if (estalagmitas.size() > 0) {
+                List<Player> players = client.getPlayers();
+                players.removeIf(x -> x.getName() != null && x.getName().equalsIgnoreCase(client.getLocalPlayer().getName()));
+                stalagmiteCount--;
+                WorldArea playerArea = new WorldArea(player.getWorldLocation().dx(-1).dy(-1), 3, 3);
+                if (stalagmiteCount == 4) {
+                    healing = true;
+                }
+
+                if (estalagmitas.stream().allMatch(x -> x.getWorldLocation().isInArea(playerArea))) {
+                    players.removeIf(x -> x.getWorldLocation().isInArea(player.getWorldArea()));
+                    Optional<Player> nearestPlayer = players.stream().min(Comparator.comparingInt(x -> x.getWorldLocation().distanceTo(playerArea)));
+                    if (nearestPlayer.isPresent()) {
+                        if (nearestPlayer.get().getWorldLocation().distanceTo(playerArea) >= 4) {
+                            healing = true;
+                        }
                     }
-                } else if (containThis > 0) {
-                    WorldArea areaContain = new WorldArea(nex.getWorldLocation().dx(-1).dy(-1), 5, 5);
-                    if (player.getWorldLocation().isInArea(areaContain)) {
+                } else {
+                    Optional<GameObject> estalagmitaCercana = estalagmitas.stream().min(Comparator.comparingInt(x -> x.getWorldLocation().distanceTo(player.getWorldLocation())));
+                    log.info("Liberando de estalagmitas");
+                    TileObjectInteraction.interact(estalagmitaCercana.get(), "Attack");
+                }
+            } else if (containThis > 0) {
+                WorldArea areaContain = new WorldArea(nex.getWorldLocation().dx(-1).dy(-1), 5, 5);
+                WorldPoint destTile = null;
+                if (client.getLocalDestinationLocation() != null) {
+                    destTile = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
+                }
+
+                if (player.getWorldLocation().isInArea(areaContain) || (destTile != null && destTile.isInArea(areaContain))) {
+                    if (destTile == null || destTile.isInArea(areaContain)) {
                         WorldPoint tileContainEscape = null;
                         for (int i = 1; i < 6; i++) {
                             tileContainEscape = PajauApiPlugin.TilesAvalibleRadial(client, i, player.getWorldLocation(), x -> !x.isInArea(areaContain));
@@ -1286,54 +1682,81 @@ public class NexPlugin extends Plugin {
                             }
                         }
                         log.info("meow: {}", tileContainEscape == null ? "no tile de escape" : "escapando de contain");
-                    } else {
-                        if (player.getInteracting() == null || player.getInteracting().getName() == null || !player.getInteracting().getName().equals(glacies.getName())) {
-                            if (player.getWorldLocation().distanceTo(glacies.getWorldLocation()) <= config.rangeDistant().getDistant()) {
-                                NPCInteraction.interact(glacies, "Attack");
-                                log.info("Pichuleando a la maraka");
+                    }
+                } else if (player.getWorldLocation().distanceTo(glacies.getWorldLocation()) <= config.rangeDistant().getDistant()) {
+                    if (player.getInteracting() == null || player.getInteracting().getName() == null || !player.getInteracting().getName().equals(glacies.getName())) {
+                        NPCInteraction.interact(glacies, "Attack");
+                        log.info("Pichuleando a la maraka");
+                    }
+                } else if (containThis <= CONTAIN_THIS_DURATION - 5) {
+                    if (player.getInteracting() == null || player.getInteracting().getName() == null || !player.getInteracting().getName().equals(glacies.getName())) {
+                        if (player.getWorldLocation().distanceTo(glacies.getWorldLocation()) <= config.rangeDistant().getDistant()) {
+                            NPCInteraction.interact(glacies, "Attack");
+                            log.info("Pichuleando a la maraka");
+                        } else {
+                            if (isIdle(player)) {
+                                moverHacia(client, config.playerKey().getGTile());
                             }
                         }
                     }
-                } else if (player.getInteracting() == null || player.getInteracting().getName() == null || !player.getInteracting().getName().equals(glacies.getName())) {
-                    NPCInteraction.interact(glacies, "Attack");
-                    log.info("Pichuleando a la maraka");
                 }
+            } else if (player.getInteracting() == null || player.getInteracting().getName() == null || !player.getInteracting().getName().equals(glacies.getName())) {
+                NPCInteraction.interact(glacies, "Attack");
+                log.info("Pichuleando a la maraka");
             }
-
 
         } else if (estado == State.FASE_5) {
             NPCs.search().idInList(NEX_IDS).first().ifPresent(x -> nex = x);
-            if (nex.getId() == 11282 || nex.isDead()) {
+            if (nex.getId() == 11282 || nex.isDead() || nex == null) {
                 escapeTile = metodo3(5);
                 if (escapeTile != null) {
                     MousePackets.queueClickPacket();
                     MovementPackets.queueMovement(escapeTile);
                     log.info("escapando de la cayampa");
                     estado = State.LOOTING;
-
+                    reset();
+                    return;
                 }
             }
 
-            if (client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT) >= config.specPercent() * 10) {
-                specing = true;
-            } else {
-                specing = false;
+            specing = client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT) >= config.specPercent() * 10;
+
+            if (config.pantiesDown()) {
+                if (piernasID == -1) {
+                    Optional<EquipmentItemWidget> legs = Equipment.search().indexIs(7).first();
+                    if (legs.isPresent()) {
+                        piernasID = legs.get().getEquipmentItemId();
+                        WidgetPackets.queueWidgetAction(legs.get(),"Remove");
+                        log.info("piernasID: {}",piernasID);
+                    }
+                }
             }
 
-            if (nex.getId() == 11281) {
+            if (config.titsOut()) {
+                if (torsoID == -1) {
+                    Optional<EquipmentItemWidget> torso = Equipment.search().indexIs(4).first();
+                    if (torso.isPresent()) {
+                        torsoID = torso.get().getEquipmentItemId();
+                        WidgetPackets.queueWidgetAction(torso.get(),"Remove");
+                        log.info("torsoID: {}",torsoID);
+                    }
+                }
+            }
+
+            if (nex != null && nex.getId() == 11281) {
                 if (specing && config.specStyle().getSkill() == Skill.RANGED) {
-                    checkGear("spec");
+                    checkGear("spec",List.of(piernasID,torsoID));
                 } else {
-                    checkGear("ranged");
+                    checkGear("ranged",List.of(piernasID,torsoID));
                 }
                 checkPrayer(Prayer.RIGOUR);
                 checkBoost(Skill.RANGED);
             } else {
                 if (specing) {
-                    checkGear("spec");
+                    checkGear("spec",List.of(piernasID,torsoID));
                     checkPrayer(config.specStyle().getPrayer());
                 } else {
-                    checkGear("melee");
+                    checkGear("melee",List.of(piernasID,torsoID));
                     checkPrayer(Prayer.PIETY);
                 }
                 checkBoost(Skill.STRENGTH);
@@ -1345,10 +1768,18 @@ public class NexPlugin extends Plugin {
                 checkPrayer(Prayer.PROTECT_FROM_MAGIC);
             }
 
+            if (estalagmitas.size() > 0) {
+                Optional<GameObject> estalagmitaCercana = estalagmitas.stream().min(Comparator.comparingInt(x -> x.getWorldLocation().distanceTo(player.getWorldLocation())));
+                log.info("Liberando de estalagmitas");
+                TileObjectInteraction.interact(estalagmitaCercana.get(), "Attack");
+                return;
+            }
+
             if (specing && Equipment.search().withId(config.specID()).first().isPresent() && client.getVarpValue(VarPlayer.SPECIAL_ATTACK_ENABLED) == 0) {
                 MousePackets.queueClickPacket();
                 WidgetPackets.queueWidgetActionPacket(1, 10485795, -1, -1);
             }
+
             if (player.getInteracting() == null) {
                 NPCInteraction.interact(nex, "Attack");
             }
@@ -1372,14 +1803,22 @@ public class NexPlugin extends Plugin {
                 if (client.getVarbitValue(13080) > getCA().getKcNeeded()) {
                     Optional<TileObject> puerta = TileObjects.search().withId(42934).first();
                     puerta.ifPresent(x -> TileObjectInteraction.interact(x, "Open"));
+                    timeout = 2+N.nextInt(3);
                     return;
                 } else {
                     estado = State.GETTING_KC;
                     return;
                 }
             } else if (player.getWorldLocation().isInArea(lobbyArea)) {
-                estado = State.STARTING;
-                return;
+                if (Inventory.search().idInList(meleeGearIDs).first().isPresent()) {
+                    checkGear("melee");
+                    log.info("Equipando las weas de melee para bankear {}",meleeGearIDs);
+                    timeout = 2;
+                    return;
+                } else {
+                    estado = State.RECOVERY;
+                    return;
+                }
             }
 
             Optional<NPC> npc = NPCs.search().idInList(NEX_IDS).first();
@@ -1424,7 +1863,7 @@ public class NexPlugin extends Plugin {
                         }
                     } else { //inventory full
                         Optional<Widget> zarosItem = Inventory.search().withId(config.zarosItemId()).first();
-                        if (zarosItem.isPresent()) {
+                        if (zarosItem.isPresent() && !player.getWorldLocation().isInArea(lobbyArea)) {
                             MousePackets.queueClickPacket();
                             WidgetPackets.queueWidgetActionPacket(3, zarosItem.get().getId(), zarosItem.get().getItemId(), zarosItem.get().getIndex());
                             timeout = 1;
@@ -1435,6 +1874,63 @@ public class NexPlugin extends Plugin {
                             MousePackets.queueClickPacket();
                             TileObjectInteraction.interact(altar.get(), "Teleport");
                         }
+                    }
+                }
+            }
+        } else if (estado == State.RECOVERY) {
+            if (Bank.isOpen()) {
+                if (client.getBoostedSkillLevel(Skill.HITPOINTS) < client.getRealSkillLevel(Skill.HITPOINTS)) {
+                    Optional<Widget> foodInInventory = BankInventory.search().withId(config.recoveryFoodId()).first();
+                    Optional<Widget> foodInBank = Bank.search().withId(config.recoveryFoodId()).first();
+                    if (foodInInventory.isPresent()) {
+                        BankInventoryInteraction.useItem(foodInInventory.get(), "Eat");
+                        timeout = 2 + N.nextInt(2);
+                    } else if (foodInBank.isPresent()) {
+                        if (Inventory.full()) {
+                            List<Integer> shit2Bank = new ArrayList<>(List.of(ItemID.SHARK, ItemID.SARADOMIN_BREW4, ItemID.VIAL, ItemID.SUPER_RESTORE4));
+                            shit2Bank.removeIf(x -> x == config.recoveryFoodId());
+                            Optional<Widget> shit = BankInventory.search().idInList(shit2Bank).first();
+                            shit.ifPresent(x -> BankInventoryInteraction.useItem(x, "Deposit-All"));
+                        } else {
+                            BankInteraction.useItem(foodInBank.get(), "Withdraw-All");
+                            timeout = 1;
+                        }
+                    } else {
+                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Recovery food not found", Color.red), "");
+                    }
+                } else if (client.getBoostedSkillLevel(Skill.PRAYER) < client.getRealSkillLevel(Skill.PRAYER) - 20
+                        || client.getBoostedSkillLevel(Skill.RANGED) < client.getRealSkillLevel(Skill.RANGED)
+                        || client.getBoostedSkillLevel(Skill.STRENGTH) < client.getRealSkillLevel(Skill.STRENGTH)
+                        || client.getBoostedSkillLevel(Skill.ATTACK) < client.getRealSkillLevel(Skill.ATTACK)) {
+                    Optional<Widget> restoreInBank = Bank.search().idInList(List.of(ItemID.SUPER_RESTORE1, ItemID.SUPER_RESTORE2, ItemID.SUPER_RESTORE3, ItemID.SUPER_RESTORE4)).first();
+                    Optional<Widget> restoreInInventory = BankInventory.search().idInList(List.of(ItemID.SUPER_RESTORE1, ItemID.SUPER_RESTORE2, ItemID.SUPER_RESTORE3, ItemID.SUPER_RESTORE4)).first();
+
+                    if (restoreInInventory.isPresent()) {
+                        BankInventoryInteraction.useItem(restoreInInventory.get(), "Drink");
+                        timeout = 2 + N.nextInt(2);
+                    } else if (restoreInBank.isPresent()) {
+                        if (Inventory.full()) {
+                            List<Integer> shit2Bank = new ArrayList<>(List.of(ItemID.SHARK, ItemID.SARADOMIN_BREW4, ItemID.VIAL, config.recoveryFoodId()));
+                            Optional<Widget> shit = BankInventory.search().idInList(shit2Bank).first();
+                            shit.ifPresent(x -> BankInventoryInteraction.useItem(x, "Deposit-All"));
+                        } else {
+                            BankInteraction.useItem(restoreInBank.get(), "Withdraw-All");
+                            timeout = 2 + N.nextInt(2);
+                        }
+                    } else {
+                        estado = State.APAGADO;
+                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Restore potion not found for recovery", Color.ORANGE), "");
+                    }
+                } else {
+                    estado = State.BANKING;
+                }
+            } else {
+                if (isIdle(player)) {
+                    Optional<NPC> reis = NPCs.search().withId(NpcID.ASHUELOT_REIS_11289).first();
+                    if (reis.isPresent()) {
+                        NPCInteraction.interact(reis.get(), "Bank");
+                    } else {
+                        client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", ColorUtil.wrapWithColorTag("Bank not found", Color.red), "");
                     }
                 }
             }
@@ -1466,9 +1962,9 @@ public class NexPlugin extends Plugin {
                     }
                 } else if (client.getBoostedSkillLevel(config.kcStyle().getSkill()) <= config.kcLvlReBoost()) {
                     Optional<Widget> pot;
-                    if (config.kcStyle() == NexConfig.Style.MELEE ) {
+                    if (config.kcStyle() == NexConfig.Style.MELEE) {
                         pot = Inventory.search().matchesWildCardNoCase("*combat*").first();
-                    }else{
+                    } else {
                         pot = Inventory.search().matchesWildCardNoCase("*ranging*").first();
                     }
 
@@ -1493,6 +1989,18 @@ public class NexPlugin extends Plugin {
             checkPrayer(Prayer.PROTECT_FROM_MAGIC);
             checkPrayer(config.kcStyle().getPrayer());
             if (!player.isInteracting()) {
+                if (config.kcLoot()) {
+                    if (!Inventory.full()) {
+                        Optional<ETileItem> loot = TileItems.search().eachItemAboveXValue(2000).first();
+                        if (loot.isPresent()) {
+                            MousePackets.queueClickPacket();
+                            TileItemPackets.queueTileItemAction(loot.get(), false);
+                            timeout = N.nextInt(2);
+                            return;
+                        }
+                    }
+                }
+
                 //atackar a un npc
                 int id;
                 if (client.getBoostedSkillLevel(Skill.SLAYER) >= 83 && config.kcStyle() == NexConfig.Style.RANGED) {
@@ -1504,25 +2012,129 @@ public class NexPlugin extends Plugin {
                 if (npc.isPresent()) {
                     NPCInteraction.interact(npc.get(), "Attack");
                     log.info("atackando");
-                    timeout = 2+N.nextInt(4);
+                    timeout = 2 + N.nextInt(4);
                     return;
                 }
                 npc = NPCs.search().withId(id).notInteracting().nearestToPlayer();
                 if (npc.isPresent()) {
                     NPCInteraction.interact(npc.get(), "Attack");
                     log.info("atackando");
-                    timeout = 2+N.nextInt(4);
+                    timeout = 2 + N.nextInt(4);
                 } else {
                     log.info("Npc not found");
                 }
             }
 
 
-
-
-
         }
 
+
+    }
+
+    private List<Integer> checkEquipment() {
+
+        Set<Integer> itemsNeeded = new HashSet<>();
+        itemsNeeded.addAll(meleeGearIDs);
+        itemsNeeded.addAll(rangedGearIDs);
+        itemsNeeded.addAll(specGearIDs);
+        itemsNeeded.add(config.meleeWepID());
+
+        List<Integer> itemsLeft = new ArrayList<>();
+
+        for (Integer a : itemsNeeded) {
+            if (Inventory.search().withId(a).empty() && Equipment.search().withId(a).empty() ) {
+                itemsLeft.add(a);
+            }
+        }
+
+        return itemsLeft;
+    }
+
+
+    private List<List<Object>> checkInv() {
+        List<List<Object>> itemNeeded = new ArrayList<>(List.of(
+                List.of(ItemID.SUPER_RESTORE4, config.restoreAmount(),"Super restore(4)"),
+                List.of(ItemID.SUPER_COMBAT_POTION4, config.combatAmount(), "Super combat potion(4)"),
+                List.of(ItemID.RANGING_POTION4, config.rangAmount(), "Ranging potion(4)")
+                ));
+
+        if (config.shouldPrepot()) {
+            if (config.heart()) {
+                itemNeeded.add(List.of(ItemID.SATURATED_HEART,1,"Saturated Heart"));
+            }
+            if (config.anglerPre()) {
+                itemNeeded.add(List.of(ItemID.ANGLERFISH,1 ,"Anglerfish"));
+            }
+            if (config.antiPre()) {
+                itemNeeded.add(List.of(ItemID.ANTIDOTE1_5958,1,"Antidote++ (1)" ));
+            }
+            if (config.menaphitePre()) {
+                itemNeeded.add(List.of(ItemID.MENAPHITE_REMEDY1,1 ,"Menaphite  (1)"));
+            }
+            if (config.rangPre()) {
+                itemNeeded.add(List.of(ItemID.RANGING_POTION1,1 ,"Ranging potion(1)"));
+            }
+            if (config.combatPre()) {
+                itemNeeded.add(List.of(ItemID.SUPER_COMBAT_POTION1,1, "Super combat potion(1)" ));
+            }
+        }
+
+        List<List<Object>> itemIncorrecto = new ArrayList<>();
+        List<Widget> item;
+
+        for (int i = 0; i < itemNeeded.size(); i++) {
+            int itemID = (int) itemNeeded.get(i).get(0);
+            int itemQty = (int) itemNeeded.get(i).get(1);
+            String itemName = (String) itemNeeded.get(i).get(2);
+            item = Inventory.search().withId(itemID).result();
+
+            if (item.size() != itemQty) {
+                itemIncorrecto.add(List.of(itemID,  itemQty - item.size(), itemName));
+            }
+        }
+
+        //-------------------------------------------------------------------------------------
+
+        List<Integer> correctItems = new ArrayList<>();
+
+        correctItems.addAll(rangedGearIDs);
+        correctItems.addAll(meleeGearIDs);
+        correctItems.addAll(specGearIDs);
+        correctItems.add(config.meleeWepID());
+        correctItems.addAll(List.of(
+                ItemID.BOOK_OF_THE_DEAD,
+                ItemID.RUNE_POUCH,
+                ItemID.DIVINE_RUNE_POUCH,
+                ItemID.RUNE_POUCH_L,
+                ItemID.DIVINE_RUNE_POUCH_L));
+        correctItems.addAll(List.of(ItemID.SUPER_RESTORE4,ItemID.SUPER_COMBAT_POTION4,ItemID.RANGING_POTION4));
+
+        if (config.shouldPrepot()) {
+            if (config.heart()) {
+                correctItems.add(ItemID.SATURATED_HEART);
+            }
+            if (config.anglerPre()) {
+                correctItems.add(ItemID.ANGLERFISH);
+            }
+            if (config.antiPre()) {
+                correctItems.add(ItemID.ANTIDOTE1_5958);
+            }
+            if (config.menaphitePre()) {
+                correctItems.add(ItemID.MENAPHITE_REMEDY1);
+            }
+            if (config.rangPre()) {
+                correctItems.add(ItemID.RANGING_POTION1);
+            }
+            if (config.combatPre()) {
+                correctItems.add(ItemID.SUPER_COMBAT_POTION1);
+            }
+        }
+
+
+        itemsNaqVer = BankInventory.search().filter(x -> !correctItems.contains(x.getItemId())).filterUnique().result();
+        log.info("itemsNaqVer: {}",itemsNaqVer.size());
+
+        return itemIncorrecto;
 
     }
 
@@ -1567,7 +2179,7 @@ public class NexPlugin extends Plugin {
             bloodSacrifice = 0;
             log.info("le saco la puta meow");
         } else if (event.getMessage().contains("Contain this!")) {
-            containThis = 12;
+            containThis = CONTAIN_THIS_DURATION;
             log.info("contenme esta");
         } else if (event.getMessage().contains("Die now, in a prison of ice!")) {
             prisionero = 7;
@@ -1577,13 +2189,13 @@ public class NexPlugin extends Plugin {
     }
 
 
-
     @Subscribe
     void onGameObjectSpawned(GameObjectSpawned event) {
         if (event.getGameObject().getId() == 42942) {
             weaNegra.add(event.getGameObject());
         } else if (event.getGameObject().getId() == STALAGMITE_ID_PRISON) {
             estalagmitas.add(event.getGameObject());
+            stalagmiteCount = 10;
         }
     }
 
@@ -1593,6 +2205,7 @@ public class NexPlugin extends Plugin {
             weaNegra.clear();
         } else if (event.getGameObject().getId() == STALAGMITE_ID_PRISON) {
             estalagmitas.clear();
+            stalagmiteCount = 0;
         }
     }
 
@@ -1788,7 +2401,6 @@ public class NexPlugin extends Plugin {
     }
 
 
-
     private WorldPoint metodo3(int radio) {
         WorldPoint nexLoc = nex.getWorldLocation().dx(1).dy(1);
         Player player = client.getLocalPlayer();
@@ -1809,7 +2421,7 @@ public class NexPlugin extends Plugin {
             cara = 3;
         }
 
-        log.info("cara inicial: {}",cara);
+        log.info("cara inicial: {}", cara);
 
         for (int i = 0; i < 4; i++) {
             runTile = buscarEn(cara, radio, 2);
@@ -1826,7 +2438,6 @@ public class NexPlugin extends Plugin {
         }
         return null;
     }
-
 
 
     private List<WorldPoint> buscarEn(int cara, int radio, int step) {

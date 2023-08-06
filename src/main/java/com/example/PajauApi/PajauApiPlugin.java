@@ -19,10 +19,7 @@ import net.runelite.http.api.worlds.World;
 import net.runelite.http.api.worlds.WorldResult;
 import net.runelite.http.api.worlds.WorldType;
 
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.function.Predicate;
 
 @Slf4j
@@ -33,6 +30,8 @@ public class PajauApiPlugin extends Plugin {
     public static final Random nRand = new Random();
 
     public static final int BANK_CLOSE_BUTTON = 786434;
+
+    public static List<WorldPoint> tilesBuscados = new ArrayList<>();
 
 
     public static WorldPoint TilesAvalibleRadial(Client clt, int radio, WorldPoint ptCentral,Predicate<? super WorldPoint> predicado){
@@ -47,6 +46,7 @@ public class PajauApiPlugin extends Plugin {
 
 
         for (int i = 0; i <= 2*radio; i++) {
+            tilesBuscados.add(ptCentral.dx(radio).dy(i-radio));
             if ((banderas[x0 + radio][y0 - radio + i] & flagCondition) == 0) {
                 if ( predicado.test(ptCentral.dx(radio).dy(i-radio))) {
                     return ptCentral.dx(radio).dy(i-radio);
@@ -55,6 +55,7 @@ public class PajauApiPlugin extends Plugin {
         }
 
         for (int i = 0; i <= 2 * radio; i++) {
+            tilesBuscados.add(ptCentral.dx(radio-i).dy(radio));
             if ((banderas[x0 + radio - i][y0 + radio] & flagCondition) == 0) {
                 if ( predicado.test(ptCentral.dx(radio-i).dy(radio))) {
                     return ptCentral.dx(radio-i).dy(radio);
@@ -63,6 +64,7 @@ public class PajauApiPlugin extends Plugin {
         }
 
         for (int i = 0; i <= 2 * radio; i++) {
+            tilesBuscados.add(ptCentral.dx(-radio).dy(radio-i));
             if ((banderas[x0 - radio][y0 + radio - i] & flagCondition) == 0) {
                 if ( predicado.test(ptCentral.dx(-radio).dy(radio-i))) {
                     return ptCentral.dx(-radio).dy(radio-i);
@@ -71,6 +73,7 @@ public class PajauApiPlugin extends Plugin {
         }
 
         for (int i = 0; i <= 2 * radio; i++) {
+            tilesBuscados.add(ptCentral.dx(i-radio).dy(-radio));
             if ((banderas[x0 - radio + i][y0 - radio] & flagCondition) == 0) {
                 if ( predicado.test(ptCentral.dx(i-radio).dy(-radio))) {
                     return ptCentral.dx(i-radio).dy(-radio);
