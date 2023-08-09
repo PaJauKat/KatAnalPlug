@@ -15,7 +15,6 @@ import com.example.PrayerFlicker.EthanPrayerFlickerPlugin;
 import com.example.Robador.RobadorPlugin;
 import com.example.Toacito.ToacitoPlugin;
 import com.example.UpkeepPlugin.UpkeepPlugin;
-import com.example.alchemicalhydra.AlchemicalHydraPlugin;
 import com.example.blackjacking.Blackjacking;
 import com.example.blastFurnace.BlastFurnacePlugin;
 import com.example.cooker.CookerPlugin;
@@ -29,9 +28,11 @@ import com.example.nex.NexPlugin;
 import com.example.spec.SpecPlugin;
 import com.example.superglass.SuperGlassMakerPlugin;
 import com.example.theatre.TheatrePlugin;
+import com.example.vampires.VampiresPlugin;
 import com.example.vardorvis.VardorvisPlugin;
 import com.example.venenatis.VenenatisPlugin;
 import com.example.worldFinder.WorldFinderPlugin;
+import com.example.RooftopAgility.RooftopAgilityPlugin;
 import net.runelite.client.RuneLite;
 import net.runelite.client.externalplugins.ExternalPluginManager;
 
@@ -46,7 +47,8 @@ public class ExamplePluginTest {
                 CaTimerPlugin.class, CallistoPlugin.class, FaldaPlugin.class, AggroResetPlugin.class,
                 VenenatisPlugin.class, Blackjacking.class, FungusPlugin.class, HydraPlugin.class,
                 CrabsPlugin.class, BlastFurnacePlugin.class, NexPlugin.class,
-                CookerPlugin.class, WorldFinderPlugin.class, SpecPlugin.class, VardorvisPlugin.class
+                CookerPlugin.class, WorldFinderPlugin.class, SpecPlugin.class, VardorvisPlugin.class,
+                RooftopAgilityPlugin.class, VampiresPlugin.class
                 );
         RuneLite.main(args);
     }

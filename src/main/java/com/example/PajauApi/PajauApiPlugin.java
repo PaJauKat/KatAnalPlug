@@ -248,7 +248,9 @@ public class PajauApiPlugin extends Plugin {
     }
 
 
+    public void bank(List<Integer> itemsInbankeables) {
 
+    }
 
 
 

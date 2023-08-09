@@ -428,7 +428,8 @@ public interface NexConfig extends Config {
     @AllArgsConstructor
     enum Style {
         RANGED(Skill.RANGED, Prayer.RIGOUR),
-        MELEE(Skill.STRENGTH, Prayer.PIETY);
+        MELEE(Skill.STRENGTH, Prayer.PIETY),
+        VOIDWAKER(Skill.STRENGTH, Prayer.PIETY);
         private final Skill skill;
         private final Prayer prayer;
     }

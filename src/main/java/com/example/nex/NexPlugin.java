@@ -819,7 +819,7 @@ public class NexPlugin extends Plugin {
                     }
                     if (!BankInventory.search().filter(x -> !itemsBuenos.contains(x.getItemId())).empty()) {
                         if (config.bankAnal()) {
-                            items2bank = BankInventory.search().filter(x -> rangedGearIDs.stream().noneMatch(y -> x.getItemId() == y)).filterUnique().result();
+                            items2bank = BankInventory.search().filter(x -> itemsBuenos.stream().noneMatch(y -> x.getItemId() == y)).filterUnique().result();
                             items2bankIterator = items2bank.listIterator();
                             cc = 0;
                             while (items2bankIterator.hasNext() && cc < 6) {
@@ -828,7 +828,7 @@ public class NexPlugin extends Plugin {
                                 BankInventoryInteraction.useItem(next, "Deposit-All");
                             }
                         } else {
-                            items2bank = BankInventory.search().filter(x -> rangedGearIDs.stream().noneMatch(y -> x.getItemId() == y)).result();
+                            items2bank = BankInventory.search().filter(x -> itemsBuenos.stream().noneMatch(y -> x.getItemId() == y)).result();
                             if (items2bank.size() > 0) {
                                 BankInventoryInteraction.useItem(items2bank.get(0), "Deposit-All");
                                 timeout = N.nextInt(2);
@@ -1291,21 +1291,34 @@ public class NexPlugin extends Plugin {
                     estado = State.FASE_3;
                 }
             } else if (nex.getPoseAnimation() == 9175 || walkUnder) {
-                if (nexWp.distanceTo(player.getWorldLocation()) <= 4) {
-                    if (darkness > 0) {
-                        healing = true;
-                    }
-                    walkUnder = true;
-                    MousePackets.queueClickPacket();
-                    MovementPackets.queueMovement(nexWp);
-                    log.info("moviendo debajo de nex");
-                    return;
-                } else {
-                    if (walkUnder) {
-                        walkUnder = false;
-                        return;
-                    }
-                }
+                 if (nex.getInteracting() != null && nex.getInteracting().getName() != null && !nex.getInteracting().getName().equalsIgnoreCase(player.getName())) {
+                     if (nex.getInteracting().getWorldLocation().distanceTo(nexWp) > 4) {
+                         runBitch++;
+                         log.info("runBitch: {}", runBitch);
+                         if (runBitch >= 2) {
+                             walkUnder = false;
+                             runBitch = 0;
+                             return;
+                         }
+                     }
+                 }
+
+                 if (nexWp.distanceTo(player.getWorldLocation()) <= 4) {
+                     if (darkness > 0) {
+                         healing = true;
+                     }
+                     walkUnder = true;
+                     MousePackets.queueClickPacket();
+                     MovementPackets.queueMovement(nexWp);
+                     log.info("moviendo debajo de nex con healing: {}",healing);
+                     return;
+                 } else {
+                     if (walkUnder) {
+                         runBitch = 0;
+                         walkUnder = false;
+                         return;
+                     }
+                 }
             }else if (weaNegra.size() > 0) {
                     log.info("wea negra!");
                     if (weaNegra.stream().anyMatch(x -> x.getWorldLocation().equals(player.getWorldLocation())) && isIdle(player)) {
@@ -1719,7 +1732,9 @@ public class NexPlugin extends Plugin {
                 }
             }
 
-            specing = client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT) >= config.specPercent() * 10;
+            specing = client.getVarpValue(VarPlayer.SPECIAL_ATTACK_PERCENT) >= config.specPercent() * 10 && estalagmitas.size() == 0;
+
+
 
             if (config.pantiesDown()) {
                 if (piernasID == -1) {
@@ -1744,7 +1759,7 @@ public class NexPlugin extends Plugin {
             }
 
             if (nex != null && nex.getId() == 11281) {
-                if (specing && config.specStyle().getSkill() == Skill.RANGED) {
+                if (specing && (config.specStyle().getSkill() == Skill.RANGED || config.specStyle() == NexConfig.Style.VOIDWAKER)) {
                     checkGear("spec",List.of(piernasID,torsoID));
                 } else {
                     checkGear("ranged",List.of(piernasID,torsoID));
@@ -1752,6 +1767,9 @@ public class NexPlugin extends Plugin {
                 checkPrayer(Prayer.RIGOUR);
                 checkBoost(Skill.RANGED);
             } else {
+                if (estalagmitas.size() > 0) {
+                    checkGear("wepMelee");
+                }
                 if (specing) {
                     checkGear("spec",List.of(piernasID,torsoID));
                     checkPrayer(config.specStyle().getPrayer());
@@ -1772,6 +1790,30 @@ public class NexPlugin extends Plugin {
                 Optional<GameObject> estalagmitaCercana = estalagmitas.stream().min(Comparator.comparingInt(x -> x.getWorldLocation().distanceTo(player.getWorldLocation())));
                 log.info("Liberando de estalagmitas");
                 TileObjectInteraction.interact(estalagmitaCercana.get(), "Attack");
+                return;
+            }
+            if (containThis > 0) {
+                WorldArea areaContain = new WorldArea(nex.getWorldLocation().dx(-1).dy(-1), 5, 5);
+                WorldPoint destTile = null;
+                if (client.getLocalDestinationLocation() != null) {
+                    destTile = WorldPoint.fromLocal(client, client.getLocalDestinationLocation());
+                }
+
+                if (player.getWorldLocation().isInArea(areaContain) || (destTile != null && destTile.isInArea(areaContain))) {
+                    if (destTile == null || destTile.isInArea(areaContain)) {
+                        WorldPoint tileContainEscape = null;
+                        for (int i = 1; i < 6; i++) {
+                            tileContainEscape = PajauApiPlugin.TilesAvalibleRadial(client, i, player.getWorldLocation(), x -> !x.isInArea(areaContain));
+                            if (tileContainEscape != null) {
+                                MousePackets.queueClickPacket();
+                                MovementPackets.queueMovement(tileContainEscape);
+                                log.info("Se encontro tile de escape");
+                                break;
+                            }
+                        }
+                        log.info("meow: {}", tileContainEscape == null ? "no tile de escape" : "escapando de contain");
+                    }
+                }
                 return;
             }
 
