@@ -24,7 +24,6 @@ import com.example.fungus.FungusPlugin;
 import com.example.gauntletFlicker.gauntletFlicker;
 import com.example.harpoon2ticker.SwordFish2Tick;
 import com.example.hydra.HydraPlugin;
-import com.example.nex.NexPlugin;
 import com.example.spec.SpecPlugin;
 import com.example.superglass.SuperGlassMakerPlugin;
 import com.example.theatre.TheatrePlugin;
@@ -46,7 +45,7 @@ public class ExamplePluginTest {
                 TheatrePlugin.class, ToacitoPlugin.class, RobadorPlugin.class, GreenDragsPlugin.class, GorilasPlugin.class,
                 CaTimerPlugin.class, CallistoPlugin.class, FaldaPlugin.class, AggroResetPlugin.class,
                 VenenatisPlugin.class, Blackjacking.class, FungusPlugin.class, HydraPlugin.class,
-                CrabsPlugin.class, BlastFurnacePlugin.class, NexPlugin.class,
+                CrabsPlugin.class, BlastFurnacePlugin.class,
                 CookerPlugin.class, WorldFinderPlugin.class, SpecPlugin.class, VardorvisPlugin.class,
                 RooftopAgilityPlugin.class, VampiresPlugin.class
                 );
