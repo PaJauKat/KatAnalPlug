@@ -26,6 +26,7 @@ import net.runelite.client.util.WildcardMatcher;
 import javax.swing.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -45,6 +46,7 @@ public class EthanApiPlugin extends Plugin {
     static PluginManager pluginManager = RuneLite.getInjector().getInstance(PluginManager.class);
     static ItemManager itemManager = RuneLite.getInjector().getInstance(ItemManager.class);
     static Method doAction = null;
+    static String animationField = null;
     public static final int[][] directionsMap = {
             {-2, 0},
             {0, 2},
@@ -101,7 +103,7 @@ public class EthanApiPlugin extends Plugin {
     public static SkullIcon getSkullIcon(Player player) {
         Field skullField = null;
         try {
-            skullField = player.getClass().getDeclaredField("ao");
+            skullField = player.getClass().getDeclaredField("ay");
             skullField.setAccessible(true);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
@@ -109,7 +111,7 @@ public class EthanApiPlugin extends Plugin {
         }
         int var1 = -1;
         try {
-            var1 = skullField.getInt(player) * 321608603;
+            var1 = skullField.getInt(player) * 705058777;
             skullField.setAccessible(false);
         } catch (IllegalAccessException | NullPointerException e) {
             e.printStackTrace();
@@ -151,27 +153,60 @@ public class EthanApiPlugin extends Plugin {
 
     @SneakyThrows
     public static int getAnimation(NPC npc) {
-        Field animation = npc.getClass().getSuperclass().getDeclaredField("ck");
+        if (npc == null) {
+            return -1;
+        }
+        if (animationField == null) {
+            for (Field declaredField : npc.getClass().getSuperclass().getDeclaredFields()) {
+                if (declaredField == null) {
+                    continue;
+                }
+                declaredField.setAccessible(true);
+                if (declaredField.getType() != int.class) {
+                    continue;
+                }
+                if (Modifier.isFinal(declaredField.getModifiers())) {
+                    continue;
+                }
+                if (Modifier.isStatic(declaredField.getModifiers())) {
+                    continue;
+                }
+                int value = declaredField.getInt(npc);
+                declaredField.setInt(npc, 4795789);
+                if (npc.getAnimation() == 1375718357 * 4795789) {
+                    animationField = declaredField.getName();
+                    declaredField.setInt(npc, value);
+                    declaredField.setAccessible(false);
+                    break;
+                }
+                declaredField.setInt(npc, value);
+                declaredField.setAccessible(false);
+            }
+        }
+        if (animationField == null) {
+            return -1;
+        }
+        Field animation = npc.getClass().getSuperclass().getDeclaredField(animationField);
         animation.setAccessible(true);
-        int anim = animation.getInt(npc) * -1553687919;
+        int anim = animation.getInt(npc) * 1375718357;
         animation.setAccessible(false);
         return anim;
     }
 
     @SneakyThrows
     public static int pathLength(NPC npc) {
-        Field pathLength = npc.getClass().getSuperclass().getDeclaredField("dq");
+        Field pathLength = npc.getClass().getSuperclass().getDeclaredField("dl");
         pathLength.setAccessible(true);
-        int path = pathLength.getInt(npc) * -1388670275;
+        int path = pathLength.getInt(npc) * -1385308684;
         pathLength.setAccessible(false);
         return path;
     }
 
     @SneakyThrows
     public static int pathLength(Player player) {
-        Field pathLength = player.getClass().getSuperclass().getDeclaredField("dq");
+        Field pathLength = player.getClass().getSuperclass().getDeclaredField("dl");
         pathLength.setAccessible(true);
-        int path = pathLength.getInt(player) * -1388670275;
+        int path = pathLength.getInt(player) * -1385308684;
         pathLength.setAccessible(false);
         return path;
     }
@@ -182,18 +217,19 @@ public class EthanApiPlugin extends Plugin {
         for (Method declaredMethod : npc.getComposition().getClass().getDeclaredMethods()) {
             if (declaredMethod.getReturnType() == short[].class && declaredMethod.getParameterTypes().length == 0) {
                 getHeadIconArrayMethod = declaredMethod;
-                break;
+                if (getHeadIconArrayMethod == null) {
+                    continue;
+                }
+                getHeadIconArrayMethod.setAccessible(true);
+                short[] headIconArray = (short[]) getHeadIconArrayMethod.invoke(npc.getComposition());
+                getHeadIconArrayMethod.setAccessible(false);
+                if (headIconArray == null || headIconArray.length == 0) {
+                    continue;
+                }
+                return HeadIcon.values()[headIconArray[0]];
             }
         }
-        if (getHeadIconArrayMethod == null) {
-            return null;
-        }
-        getHeadIconArrayMethod.setAccessible(true);
-        short[] headIconArray = (short[]) getHeadIconArrayMethod.invoke(npc.getComposition());
-        if (headIconArray == null || headIconArray.length == 0) {
-            return null;
-        }
-        return HeadIcon.values()[headIconArray[0]];
+        return null;
     }
 
     @Deprecated
@@ -389,12 +425,13 @@ public class EthanApiPlugin extends Plugin {
                         continue;
                     }
                     doAction = declaredMethod;
+                    System.out.println(doAction);
                     break;
                 }
             }
         }
         doAction.setAccessible(true);
-        doAction.invoke(null, var0, var1, var2, var3, var4, var5, var6, var7, var8, (byte) 5);
+        doAction.invoke(null, var0, var1, var2, var3, var4, var5, var6, var7, var8, (byte) 102);
         doAction.setAccessible(false);
     }
 

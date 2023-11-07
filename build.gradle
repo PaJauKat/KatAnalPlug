@@ -12,7 +12,7 @@ repositories {
     jcenter()
 }
 
-def runeLiteVersion = 'latest.release'
+def runeLiteVersion = '1.10.16.1'
 
 dependencies {
     compileOnly group: 'net.runelite', name: 'client', version: runeLiteVersion
@@ -28,7 +28,6 @@ dependencies {
     implementation "io.reactivex.rxjava3:rxjava:3.1.6"
 }
 sourceSets {
-
     main {
 
         java {
@@ -39,8 +38,9 @@ sourceSets {
 }
 
 group = 'com.example'
-version = '4.9'
+version = '5.4'
 sourceCompatibility = "11"
+targetCompatibility = "11"
 
 task FatJar(type: Jar) {
     manifest {
@@ -50,6 +50,7 @@ task FatJar(type: Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     exclude("com/example/hidden")
+    exclude("com/example/PathingTesting")
     with jar
 }
 
